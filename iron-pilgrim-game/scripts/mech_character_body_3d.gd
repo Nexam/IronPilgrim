@@ -6,12 +6,14 @@ extends CharacterBody3D
 
 @export var move_speed := 5.0
 @export var mouse_sensitivity := 0.003
-@export var camera: Camera3D
+@export var mech_config:MechConfig
+var camera: Camera3D
 
 var gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
 var _mouse_pitch := 0.0
 
 func _ready() -> void:
+	camera = mech_config.camera
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 
 func _unhandled_input(event: InputEvent) -> void:

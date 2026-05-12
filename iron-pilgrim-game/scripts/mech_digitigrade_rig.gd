@@ -38,6 +38,9 @@ class_name MechDigitigradeRig
 @export var knee_pole := Vector3.FORWARD
 ## How far a foot reaches straight down when the raycast finds no ground.
 @export var max_drop := 3.0
+## Height of the foot joint above the sole (ground contact). The cannon aims to
+## contact + up * foot_height so the joint sits at the right elevation.
+@export_range(0.0, 1.0, 0.01) var foot_height := 0.15
 ## Draw small spheres at each leg's hip (white) / knee (green) / hock (blue) / contact (red).
 @export var debug_draw := false
 
@@ -138,11 +141,13 @@ func _solve_leg(skel: Skeleton3D, leg: Leg, to_skel: Transform3D, pole: Vector3,
 		var hip_world := skel.global_transform * hip
 		contact = to_skel * (hip_world + Vector3.DOWN * reach)
 
-	# hock = up-and-rearward from the contact by the cannon, leaned by the pitch
+	# hock = up-and-rearward from the foot joint by the cannon, leaned by the pitch
 	var pitch := deg_to_rad(cannon_pitch_deg)
 	var up := skel.global_transform.basis.inverse() * Vector3.UP
 	var rearward := -pole
-	var hock := contact + (up * cos(pitch) + rearward * sin(pitch)).normalized() * leg.len_cannon
+	# foot_joint is the bone origin — above the sole by foot_height
+	var foot_joint := contact + up * foot_height
+	var hock := foot_joint + (up * cos(pitch) + rearward * sin(pitch)).normalized() * leg.len_cannon
 
 	# 2-bone IK: tigh + shin from hip to hock
 	var knee := _solve_two_bone(hip, hock, leg.len_thigh, leg.len_shin, pole)
@@ -152,12 +157,12 @@ func _solve_leg(skel: Skeleton3D, leg: Leg, to_skel: Transform3D, pole: Vector3,
 	var g_parent := skel.get_bone_global_pose(skel.get_bone_parent(leg.thigh))
 	var g_thigh := _aim_bone(skel, leg.thigh, g_parent, hip, knee)
 	var g_shin := _aim_bone(skel, leg.shin, g_thigh, knee, hock)
-	var g_cannon := _aim_bone(skel, leg.cannon, g_shin, hock, contact)
+	var g_cannon := _aim_bone(skel, leg.cannon, g_shin, hock, foot_joint)
 	# foot: lie along the ground (forward projected onto the ground plane)
 	var foot_dir := (pole - ground_n * pole.dot(ground_n))
 	if foot_dir.length() < 0.01:
 		foot_dir = pole
-	_aim_bone(skel, leg.foot, g_cannon, contact, contact + foot_dir.normalized())
+	_aim_bone(skel, leg.foot, g_cannon, foot_joint, foot_joint + foot_dir.normalized())
 
 	if debug_draw:
 		var b := leg_index * 4
