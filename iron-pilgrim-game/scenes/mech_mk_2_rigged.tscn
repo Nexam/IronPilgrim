@@ -1,0 +1,62 @@
+[gd_scene format=3 uid="uid://dah0ic7r2c7an"]
+
+[ext_resource type="PackedScene" uid="uid://dxl72h4yv2d8h" path="res://assets/mech-mk2-rigged.glb" id="1_tox6t"]
+[ext_resource type="Script" uid="uid://crbmw8n5lvs2q" path="res://scripts/mech_config.gd" id="2_nmk4x"]
+[ext_resource type="Material" uid="uid://sl1cmq81r1eo" path="res://assets/mech_material.tres" id="3_ruqfn"]
+[ext_resource type="Script" uid="uid://cawirynek8uwb" path="res://scripts/mech_digitigrade_rig.gd" id="3_uo7wk"]
+
+[node name="mech-mk2-rigged" unique_id=928044897 node_paths=PackedStringArray("rig", "camera") instance=ExtResource("1_tox6t")]
+script = ExtResource("2_nmk4x")
+rig = NodePath("mech_armature/Skeleton3D/MechDigitigradeRig")
+camera = NodePath("mech_armature/Skeleton3D/BoneAttachment3D/Camera3D")
+
+[node name="Skeleton3D" parent="mech_armature" parent_id_path=PackedInt32Array(2067543897) index="1" unique_id=1008643129]
+modifier_callback_mode_process = 0
+
+[node name="BoneAttachment3D" type="BoneAttachment3D" parent="mech_armature/Skeleton3D" index="0" unique_id=1007536150]
+transform = Transform3D(1, 0, 2.3841855e-07, 0, 0.99999994, 0, -2.3841855e-07, 0, 1, 8.108072e-08, 2.3546157, 0.33719313)
+bone_name = "torso"
+bone_idx = 2
+
+[node name="Camera3D" type="Camera3D" parent="mech_armature/Skeleton3D/BoneAttachment3D" index="0" unique_id=523330750]
+transform = Transform3D(-1, 0, -8.742275e-08, 0, 1.0000001, 0, 8.742275e-08, 0, -1, 1.418947e-07, 0.6776726, 0.29044485)
+cull_mask = 1048573
+
+[node name="Cube_001" parent="mech_armature/Skeleton3D" index="1" unique_id=1148987047]
+layers = 2
+surface_material_override/0 = ExtResource("3_ruqfn")
+
+[node name="Cylinder_004" parent="mech_armature/Skeleton3D" index="2" unique_id=2103710296]
+surface_material_override/0 = ExtResource("3_ruqfn")
+
+[node name="MechDigitigradeRig" type="SkeletonModifier3D" parent="mech_armature/Skeleton3D" index="3" unique_id=325985680 node_paths=PackedStringArray("foot_ray_l", "foot_ray_r")]
+unique_name_in_owner = false
+process_mode = 0
+process_priority = 0
+process_physics_priority = 0
+process_thread_group = 0
+physics_interpolation_mode = 0
+auto_translate_mode = 0
+editor_description = ""
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+rotation_edit_mode = 0
+rotation_order = 2
+top_level = false
+visible = true
+visibility_parent = NodePath("")
+active = true
+influence = 1.0
+script = ExtResource("3_uo7wk")
+foot_ray_l = NodePath("../../../RayCast_Foot_L")
+foot_ray_r = NodePath("../../../RayCast_Foot_R")
+metadata/_custom_type_script = "uid://cawirynek8uwb"
+
+[node name="RayCast_Foot_L" type="RayCast3D" parent="." index="1" unique_id=464520562]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.6962352, 0, 0.5368401)
+target_position = Vector3(0, -6, 0)
+hit_from_inside = true
+
+[node name="RayCast_Foot_R" type="RayCast3D" parent="." index="2" unique_id=292703179]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.690915, 0, 0.5368401)
+target_position = Vector3(0, -6, 0)
+hit_from_inside = true

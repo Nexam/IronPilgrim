@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://bsle8opej6jgn"]
 
-[ext_resource type="PackedScene" uid="uid://bc6kcjqn7fwrf" path="res://scenes/mech_rigged.tscn" id="2_pvwu3"]
+[ext_resource type="PackedScene" uid="uid://dah0ic7r2c7an" path="res://scenes/mech_mk_2_rigged.tscn" id="2_pvwu3"]
 [ext_resource type="ArrayMesh" uid="uid://ldip3ehmfku5" path="res://assets/mech-blockout.obj" id="3_pvwu3"]
 [ext_resource type="Script" uid="uid://bk0onibnrxl4x" path="res://scripts/mech_character_body_3d.gd" id="dev_walk_gd"]
 
@@ -34,7 +34,7 @@ orientation = 1
 albedo_color = Color(0.30325416, 0.2318801, 0.16879258, 1)
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_m2kco"]
-radius = 2.1020508
+radius = 1.4902344
 height = 4.2041016
 
 [sub_resource type="BoxMesh" id="BoxMesh_j671i"]
@@ -70,15 +70,17 @@ surface_material_override/0 = SubResource("StandardMaterial3D_j7i7u")
 
 [node name="CharacterBody3D" type="CharacterBody3D" parent="." unique_id=304978248 node_paths=PackedStringArray("mech_config")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.3701057, 0)
+collision_layer = 2
 script = ExtResource("dev_walk_gd")
 move_speed = 2.5
-mech_config = NodePath("mech-rigged")
+mech_config = NodePath("mech-mk2-rigged")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="CharacterBody3D" unique_id=582532766]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.0922847, 0)
 shape = SubResource("CapsuleShape3D_m2kco")
 
-[node name="mech-rigged" parent="CharacterBody3D" unique_id=1107792023 node_paths=PackedStringArray("chassis") instance=ExtResource("2_pvwu3")]
+[node name="mech-mk2-rigged" parent="CharacterBody3D" unique_id=928044897 node_paths=PackedStringArray("chassis") instance=ExtResource("2_pvwu3")]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0, 0, 0)
 chassis = NodePath("..")
 
 [node name="Marker3D" type="Marker3D" parent="CharacterBody3D" unique_id=1272980618]
@@ -122,11 +124,11 @@ mesh = ExtResource("3_pvwu3")
 size = Vector2i(350, 420)
 
 [node name="Side-debug-camera" type="Camera3D" parent="SubViewport" unique_id=1994743265]
-transform = Transform3D(0.5891963, -0.48851, 0.6435881, 0, 0.79652995, 0.6045991, -0.8079899, -0.3562276, 0.4693125, -0.5655651, 5.5236387, -2.1480515)
+transform = Transform3D(0.5891963, -0.48851, 0.6435881, 0, 0.79652995, 0.6045991, -0.8079899, -0.3562276, 0.4693125, -5.480053, 4.8025284, -5.535632)
 
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1303665368]
 
 [node name="TextureRect" type="TextureRect" parent="CanvasLayer" unique_id=359433257]
-offset_right = 225.0
-offset_bottom = 294.0
+offset_right = 497.0
+offset_bottom = 596.4
 texture = SubResource("ViewportTexture_j7i7u")
