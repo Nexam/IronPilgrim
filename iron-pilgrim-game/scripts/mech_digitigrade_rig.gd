@@ -1,3 +1,4 @@
+@tool
 extends SkeletonModifier3D
 class_name MechDigitigradeRig
 
@@ -27,59 +28,36 @@ class_name MechDigitigradeRig
 ## Only one foot swings at a time; a step_min_interval lockout stops stutter.
 ##
 ## The pelvis/torso bones are NOT driven yet (camera rides a BoneAttachment on
-## `torso`); the pelvis solve is the next step — when it lands, swap the
-## get_bone_global_rest hip look-up below for get_bone_global_pose.
-##
-## First pass on the mk2 skeleton — expect to flip a sign or two and tune exports
-## in the editor. Knee bending backward -> flip `knee_pole`. Whole leg inside-out
-## -> flip the rotation sign in `_solve_two_bone`.
+## `torso`); the pelvis solve is the next step.
 
-# --- wiring (assign in the editor) ---------------------------------------
+# Bone name contract — fixed across all biped mechs.
+# "tigh" fallback kept until the mk2 blockout is re-exported from Blender.
+const BONE_THIGH_ROLL  := "thigh_roll"
+const BONE_THIGH       := "thigh"
+const BONE_SHIN        := "shin"
+const BONE_CANNON      := "cannon"
+const BONE_ANKLE_PITCH := "ankle_pitch"
+const BONE_ANKLE_ROLL  := "ankle_roll"
+const SUFFIX_L         := ".L"
+const SUFFIX_R         := ".R"
+
+# --- wiring ------------------------------------------------------------------
 @export var chassis: CharacterBody3D
 @export var foot_ray_l: RayCast3D
 @export var foot_ray_r: RayCast3D
 
-# --- bone names -----------------------------------------------------------
-@export var seg_thigh_roll := "thigh_roll"
-@export var seg_thigh := "thigh"
-@export var seg_shin := "shin"
-@export var seg_cannon := "cannon"
-@export var seg_ankle_pitch := "ankle_pitch"
-@export var seg_ankle_roll := "ankle_roll"
-@export var suffix_l := ".L"
-@export var suffix_r := ".R"
-
-# --- leg / IK tuning ------------------------------------------------------
-## Direction the stifle ("knee") bends, in chassis space. FORWARD = forward.
-@export var knee_pole := Vector3.FORWARD
-## How far a foot reaches straight down when the raycast finds no ground.
-@export var max_drop := 3.0
-## Height of the ankle joint above the sole (ground contact). The cannon aims to
-## contact + up * foot_height so the ankle sits at the right elevation. Tune per mech.
-@export_range(0.0, 1.5, 0.01) var foot_height := 0.2
-## Cannon (metatarsal) lean from vertical when the leg is folded up under the body.
-@export_range(0.0, 80.0, 1.0) var cannon_pitch_folded := 55.0
-## Cannon lean from vertical when the leg is reaching near full extension.
-@export_range(0.0, 80.0, 1.0) var cannon_pitch_extended := 15.0
-
-# --- gait tuning ----------------------------------------------------------
-## A planted foot this far (m) from its ideal spot triggers a step.
-@export var step_trigger_dist := 0.45
-## How long a swing takes (s).
-@export var step_duration := 0.35
-## Peak lift of the foot mid-swing (m).
-@export var step_height := 0.35
-## Predict the foot's plant point this far ahead by current velocity (s).
-@export var step_lead_time := 0.15
-## Minimum time between successive steps of the *same* foot (s) — anti-stutter.
-@export var step_min_interval := 0.15
-## Chassis yaw change (deg) since a foot planted that forces it to re-step,
-## so turning in place re-plants the feet instead of pivoting like a tripod.
-@export var yaw_replant_deg := 18.0
-
-## Draw spheres: hip (white) / knee (green) / hock (blue) / foot target (red planted, yellow stepping).
+## Runtime debug spheres: hip (white) / knee (green) / hock (blue) /
+## foot target (red planted, yellow stepping).
 @export var debug_draw := false
 
+var _config: MechConfig
+@export var config: MechConfig:
+	set(value):
+		_config = value
+	get:
+		return _config
+
+# --- runtime state -----------------------------------------------------------
 enum FootState { PLANTED, STEPPING }
 
 class Leg:
@@ -90,15 +68,14 @@ class Leg:
 	var ankle_pitch := -1
 	var ankle_roll := -1
 	var ray: RayCast3D
-	var len_thigh_roll := 0.0   # hip ball centre -> thigh pitch joint
-	var len_thigh := 0.0        # thigh joint -> knee
-	var len_shin := 0.0         # knee -> hock
-	var len_cannon := 0.0       # hock -> ankle joint
-	var len_ankle_pitch := 0.0  # ankle joint -> ankle_roll joint
-	# gait state, world space
+	var len_thigh_roll := 0.0
+	var len_thigh := 0.0
+	var len_shin := 0.0
+	var len_cannon := 0.0
+	var len_ankle_pitch := 0.0
 	var state: int = FootState.PLANTED
 	var initialised := false
-	var foot_pos := Vector3.ZERO        # current world target (sole contact)
+	var foot_pos := Vector3.ZERO
 	var foot_normal := Vector3.UP
 	var plant_yaw := 0.0
 	var time_since_step := 999.0
@@ -116,30 +93,43 @@ var _setup_done := false
 var _dbg: Array[MeshInstance3D] = []
 var _last_tick_usec := 0
 
+# --- editor overlay ----------------------------------------------------------
+var _overlay_mat: StandardMaterial3D
+var _overlay_mesh: ImmediateMesh
+var _overlay_instance: MeshInstance3D
+
+
+func _ready() -> void:
+	if Engine.is_editor_hint():
+		_rebuild_overlay()
+
+
+func _process(_delta: float) -> void:
+	if Engine.is_editor_hint():
+		_rebuild_overlay()
+
 
 func _setup(skel: Skeleton3D) -> void:
 	_legs.clear()
-	for spec: Array in [[suffix_l, foot_ray_l], [suffix_r, foot_ray_r]]:
+	for spec: Array in [[SUFFIX_L, foot_ray_l], [SUFFIX_R, foot_ray_r]]:
 		var sfx: String = spec[0]
 		var leg := Leg.new()
-		leg.thigh_roll = skel.find_bone(seg_thigh_roll + sfx)
-		leg.thigh = skel.find_bone(seg_thigh + sfx)
-		leg.shin = skel.find_bone(seg_shin + sfx)
-		leg.cannon = skel.find_bone(seg_cannon + sfx)
-		leg.ankle_pitch = skel.find_bone(seg_ankle_pitch + sfx)
-		leg.ankle_roll = skel.find_bone(seg_ankle_roll + sfx)
+		var thigh_name := BONE_THIGH if skel.find_bone(BONE_THIGH + sfx) >= 0 else "tigh"
+		leg.thigh_roll  = skel.find_bone(BONE_THIGH_ROLL  + sfx)
+		leg.thigh       = skel.find_bone(thigh_name       + sfx)
+		leg.shin        = skel.find_bone(BONE_SHIN        + sfx)
+		leg.cannon      = skel.find_bone(BONE_CANNON      + sfx)
+		leg.ankle_pitch = skel.find_bone(BONE_ANKLE_PITCH + sfx)
+		leg.ankle_roll  = skel.find_bone(BONE_ANKLE_ROLL  + sfx)
 		leg.ray = spec[1]
 		if not leg.ok():
 			push_warning("MechDigitigradeRig: missing leg bones for suffix '%s' (thigh_roll=%d thigh=%d shin=%d cannon=%d ankle_pitch=%d ankle_roll=%d)" % [sfx, leg.thigh_roll, leg.thigh, leg.shin, leg.cannon, leg.ankle_pitch, leg.ankle_roll])
 			continue
-		# segment length = the child bone's rest offset from this bone's joint.
-		leg.len_thigh_roll = skel.get_bone_rest(leg.thigh).origin.length()
-		leg.len_thigh = skel.get_bone_rest(leg.shin).origin.length()
-		leg.len_shin = skel.get_bone_rest(leg.cannon).origin.length()
-		leg.len_cannon = skel.get_bone_rest(leg.ankle_pitch).origin.length()
+		leg.len_thigh_roll  = skel.get_bone_rest(leg.thigh).origin.length()
+		leg.len_thigh       = skel.get_bone_rest(leg.shin).origin.length()
+		leg.len_shin        = skel.get_bone_rest(leg.cannon).origin.length()
+		leg.len_cannon      = skel.get_bone_rest(leg.ankle_pitch).origin.length()
 		leg.len_ankle_pitch = skel.get_bone_rest(leg.ankle_roll).origin.length()
-		# the foot rays now start up at hip height — inside the chassis capsule —
-		# so they must ignore it (otherwise hit_from_inside reports the capsule).
 		if leg.ray != null and chassis != null:
 			leg.ray.add_exception(chassis)
 		_legs.append(leg)
@@ -150,8 +140,6 @@ func _setup(skel: Skeleton3D) -> void:
 			print("MechDigitigradeRig: leg %d bound — lengths roll=%.2f thigh=%.2f shin=%.2f cannon=%.2f ankle=%.2f" % [i, l.len_thigh_roll, l.len_thigh, l.len_shin, l.len_cannon, l.len_ankle_pitch])
 
 
-# Wall-clock delta, robust to whatever callback mode the Skeleton3D runs us in
-# (and to being called more than once a frame). Clamped against hitches.
 func _tick_delta() -> float:
 	var now := Time.get_ticks_usec()
 	if _last_tick_usec == 0:
@@ -163,6 +151,10 @@ func _tick_delta() -> float:
 
 
 func _process_modification() -> void:
+	if Engine.is_editor_hint():
+		return
+	if _config == null:
+		return
 	var skel := get_skeleton()
 	if skel == null:
 		return
@@ -177,10 +169,10 @@ func _process_modification() -> void:
 	var delta := _tick_delta()
 	_update_gait(skel, delta)
 
-	var to_skel := skel.global_transform.affine_inverse() # world -> skeleton-local
+	var to_skel := skel.global_transform.affine_inverse()
 	var pole := Vector3.FORWARD
 	if chassis != null:
-		pole = (to_skel.basis * (chassis.global_transform.basis * knee_pole)).normalized()
+		pole = (to_skel.basis * (chassis.global_transform.basis * _config.knee_pole)).normalized()
 	if pole.length() < 0.001:
 		pole = Vector3.FORWARD
 
@@ -188,7 +180,7 @@ func _process_modification() -> void:
 		_solve_leg(skel, _legs[i], to_skel, pole, i)
 
 
-# --- gait FSM -------------------------------------------------------------
+# --- gait FSM ----------------------------------------------------------------
 
 func _update_gait(skel: Skeleton3D, delta: float) -> void:
 	var vel_h := Vector3.ZERO
@@ -198,7 +190,6 @@ func _update_gait(skel: Skeleton3D, delta: float) -> void:
 		vel_h = Vector3(v.x, 0.0, v.z)
 		yaw = chassis.global_rotation.y
 
-	# only one foot may swing at a time
 	var someone_stepping := false
 	for leg in _legs:
 		if leg.state == FootState.STEPPING:
@@ -208,12 +199,10 @@ func _update_gait(skel: Skeleton3D, delta: float) -> void:
 	for leg in _legs:
 		leg.time_since_step += delta
 
-		# ideal world-space plant spot: hip-socket ground-projection, led by
-		# velocity. (pelvis/thigh_roll undriven, so global_rest == current pose.)
 		var hip_world: Vector3 = skel.global_transform * skel.get_bone_global_rest(leg.thigh).origin
-		var ideal_from := hip_world + vel_h * step_lead_time
+		var ideal_from := hip_world + vel_h * _config.step_lead_time
 		var ground := _ground_under(leg.ray, ideal_from)
-		var ideal_pos: Vector3 = ground[1] if ground[0] else Vector3(ideal_from.x, hip_world.y - max_drop, ideal_from.z)
+		var ideal_pos: Vector3 = ground[1] if ground[0] else Vector3(ideal_from.x, hip_world.y - _config.max_drop, ideal_from.z)
 		var ideal_n: Vector3 = ground[2]
 
 		if not leg.initialised:
@@ -224,18 +213,17 @@ func _update_gait(skel: Skeleton3D, delta: float) -> void:
 			continue
 
 		if leg.state == FootState.PLANTED:
-			var drifted := leg.foot_pos.distance_to(ideal_pos) > step_trigger_dist
-			var yawed := absf(wrapf(yaw - leg.plant_yaw, -PI, PI)) > deg_to_rad(yaw_replant_deg)
-			if (drifted or yawed) and not someone_stepping and leg.time_since_step >= step_min_interval:
+			var drifted := leg.foot_pos.distance_to(ideal_pos) > _config.step_trigger_dist
+			var yawed := absf(wrapf(yaw - leg.plant_yaw, -PI, PI)) > deg_to_rad(_config.yaw_replant_deg)
+			if (drifted or yawed) and not someone_stepping and leg.time_since_step >= _config.step_min_interval:
 				leg.state = FootState.STEPPING
 				leg.step_from = leg.foot_pos
 				leg.step_to = ideal_pos
 				leg.step_to_normal = ideal_n
 				leg.step_t = 0.0
 				someone_stepping = true
-		else: # STEPPING
-			leg.step_t += delta / maxf(step_duration, 0.01)
-			# chase a moving target a little while the swing is young
+		else:
+			leg.step_t += delta / maxf(_config.step_duration, 0.01)
 			if leg.step_t < 0.5:
 				leg.step_to = leg.step_to.lerp(ideal_pos, 0.2)
 				leg.step_to_normal = ideal_n
@@ -247,17 +235,15 @@ func _update_gait(skel: Skeleton3D, delta: float) -> void:
 				leg.time_since_step = 0.0
 			else:
 				var flat := leg.step_from.lerp(leg.step_to, leg.step_t)
-				leg.foot_pos = flat + Vector3.UP * (sin(leg.step_t * PI) * step_height)
+				leg.foot_pos = flat + Vector3.UP * (sin(leg.step_t * PI) * _config.step_height)
 				leg.foot_normal = Vector3.UP.lerp(leg.step_to_normal, leg.step_t).normalized()
 
 
-# Raycast straight down through `at` to find the ground. Repositions `ray`,
-# updates it immediately, and returns [hit: bool, point: Vector3, normal: Vector3].
 func _ground_under(ray: RayCast3D, at: Vector3) -> Array:
 	if ray == null:
 		return [false, at, Vector3.UP]
 	ray.global_position = at + Vector3.UP * 0.5
-	ray.target_position = Vector3.DOWN * (max_drop + 1.0)
+	ray.target_position = Vector3.DOWN * (_config.max_drop + 1.0)
 	ray.force_raycast_update()
 	if ray.is_colliding():
 		var n := ray.get_collision_normal()
@@ -265,56 +251,39 @@ func _ground_under(ray: RayCast3D, at: Vector3) -> Array:
 	return [false, at, Vector3.UP]
 
 
-# --- leg IK ---------------------------------------------------------------
+# --- leg IK ------------------------------------------------------------------
 
 func _solve_leg(skel: Skeleton3D, leg: Leg, to_skel: Transform3D, pole: Vector3, leg_index: int) -> void:
-	# hip socket (top of the femur = thigh's joint), skeleton-local. thigh_roll
-	# and the pelvis are undriven, so rest == current pose.
 	var hip := skel.get_bone_global_rest(leg.thigh).origin
 
-	# foot target + ground normal, skeleton-local (from the gait FSM)
 	var contact := to_skel * leg.foot_pos
 	var ground_n := (to_skel.basis * leg.foot_normal).normalized()
 	if ground_n.length() < 0.001:
 		ground_n = (skel.global_transform.basis.inverse() * Vector3.UP).normalized()
 	var up := (skel.global_transform.basis.inverse() * Vector3.UP).normalized()
 
-	# ankle joint sits above the sole (foot is a short peg perpendicular to the
-	# ground); cannon lean is derived from how far the leg is reaching — folded
-	# when compressed, straighter near full extension.
-	var ankle_joint := contact + ground_n * foot_height
+	var ankle_joint := contact + ground_n * _config.foot_height
 	var max_reach := leg.len_thigh + leg.len_shin + leg.len_cannon
 	var t := clampf(((ankle_joint - hip).length() / max_reach - 0.5) / 0.45, 0.0, 1.0)
-	var pitch := deg_to_rad(lerpf(cannon_pitch_folded, cannon_pitch_extended, t))
+	var pitch := deg_to_rad(lerpf(_config.cannon_pitch_folded, _config.cannon_pitch_extended, t))
 
-	# hock = up-and-rearward from the ankle joint by the cannon, leaned by pitch
 	var rearward := -pole
 	var hock := ankle_joint + (up * cos(pitch) + rearward * sin(pitch)).normalized() * leg.len_cannon
 
-	# 2-bone analytic IK: thigh + shin (both pitch hinges) from the hip socket to
-	# the hock, knee bending toward `pole` (forward) — the sagittal plane.
 	var knee := _solve_two_bone(hip, hock, leg.len_thigh, leg.len_shin, pole)
 
-	# write parent-first, accumulating global transforms ourselves. _aim_bone keeps
-	# each bone's rest *position* (joints don't slide) and only rotates +Y at the
-	# given target. thigh_roll stays at its rest orientation (aim it at the hip
-	# socket's rest spot) — the ball-joint abduction is a later refinement; pelvis
-	# is undriven, so its rest == its pose.
 	var g_pelvis := skel.get_bone_global_rest(skel.get_bone_parent(leg.thigh_roll))
-	var g_roll := _aim_bone(skel, leg.thigh_roll, g_pelvis, hip)
-	var g_thigh := _aim_bone(skel, leg.thigh, g_roll, knee)
-	var g_shin := _aim_bone(skel, leg.shin, g_thigh, hock)
-	var g_cannon := _aim_bone(skel, leg.cannon, g_shin, ankle_joint)
-	# foot peg: ankle_pitch and ankle_roll both aim down at the contact point —
-	# on flat ground that's their rest orientation; on a slope it tilts to match.
-	# (Proper pitch/roll split for terrain conform comes with the constraint pass.)
-	var g_ap := _aim_bone(skel, leg.ankle_pitch, g_cannon, contact)
+	var g_roll   := _aim_bone(skel, leg.thigh_roll,  g_pelvis, hip)
+	var g_thigh  := _aim_bone(skel, leg.thigh,        g_roll,   knee)
+	var g_shin   := _aim_bone(skel, leg.shin,          g_thigh,  hock)
+	var g_cannon := _aim_bone(skel, leg.cannon,        g_shin,   ankle_joint)
+	var g_ap     := _aim_bone(skel, leg.ankle_pitch,  g_cannon, contact)
 	_aim_bone(skel, leg.ankle_roll, g_ap, contact)
 
 	if debug_draw:
 		var b := leg_index * 4
-		_dbg_point(skel, b + 0, Color.WHITE, hip)
-		_dbg_point(skel, b + 1, Color.GREEN, knee)
+		_dbg_point(skel, b + 0, Color.WHITE,        hip)
+		_dbg_point(skel, b + 1, Color.GREEN,         knee)
 		_dbg_point(skel, b + 2, Color.DEEP_SKY_BLUE, hock)
 		_dbg_point(skel, b + 3, Color.YELLOW if leg.state == FootState.STEPPING else Color.RED, contact)
 
@@ -323,10 +292,7 @@ func _dbg_point(skel: Skeleton3D, idx: int, color: Color, local_pos: Vector3) ->
 	while _dbg.size() <= idx:
 		var m := MeshInstance3D.new()
 		var sm := SphereMesh.new()
-		sm.radius = 0.08
-		sm.height = 0.16
-		sm.radial_segments = 8
-		sm.rings = 4
+		sm.radius = 0.08; sm.height = 0.16; sm.radial_segments = 8; sm.rings = 4
 		m.mesh = sm
 		var mat := StandardMaterial3D.new()
 		mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
@@ -340,9 +306,6 @@ func _dbg_point(skel: Skeleton3D, idx: int, color: Color, local_pos: Vector3) ->
 	mi.position = local_pos
 
 
-# Rotates bone `b` so its local +Y points toward `tip`, keeping its rest
-# position (the joint stays put — bones rotate, they don't slide). `g_parent` is
-# the bone's parent's skeleton-local transform; returns this bone's new one.
 func _aim_bone(skel: Skeleton3D, b: int, g_parent: Transform3D, tip: Vector3) -> Transform3D:
 	var rest_local_pos := skel.get_bone_rest(b).origin
 	var head: Vector3 = g_parent * rest_local_pos
@@ -354,10 +317,8 @@ func _aim_bone(skel: Skeleton3D, b: int, g_parent: Transform3D, tip: Vector3) ->
 	return g
 
 
-# --- math helpers ---------------------------------------------------------
+# --- math helpers ------------------------------------------------------------
 
-# Middle-joint position for a 2-bone chain from `root` to `target`, bending the
-# joint toward `pole`. All vectors in the same space.
 static func _solve_two_bone(root: Vector3, target: Vector3, l1: float, l2: float, pole: Vector3) -> Vector3:
 	var to_t := target - root
 	var dist := clampf(to_t.length(), absf(l1 - l2) + 0.001, l1 + l2 - 0.001)
@@ -368,11 +329,9 @@ static func _solve_two_bone(root: Vector3, target: Vector3, l1: float, l2: float
 	if axis.length() < 0.001:
 		axis = dir.cross(Vector3.RIGHT if absf(dir.x) < 0.9 else Vector3.UP)
 	axis = axis.normalized()
-	# rotate the straight-line direction toward the pole side by `angle`
 	return root + dir.rotated(axis, angle) * l1
 
 
-# Basis whose +Y points along `dir`, keeping roll as close to `ref` as possible.
 static func _basis_aim_y(dir: Vector3, ref: Basis) -> Basis:
 	var y := dir.normalized()
 	if y.length() < 0.001:
@@ -384,3 +343,137 @@ static func _basis_aim_y(dir: Vector3, ref: Basis) -> Basis:
 	var x := y.cross(z).normalized()
 	z = x.cross(y).normalized()
 	return Basis(x, y, z)
+
+
+# --- editor overlay ----------------------------------------------------------
+# Draws constraint arcs and gait zones directly into an ImmediateMesh child.
+# Only exists at edit time; no-depth-test so it always renders on top.
+
+func _rebuild_overlay() -> void:
+	if not Engine.is_editor_hint():
+		return
+	if not is_instance_valid(_overlay_instance):
+		_overlay_mat = StandardMaterial3D.new()
+		_overlay_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		_overlay_mat.no_depth_test = true
+		_overlay_mat.vertex_color_use_as_albedo = true
+		_overlay_mat.disable_receive_shadows = true
+		_overlay_mesh = ImmediateMesh.new()
+		_overlay_instance = MeshInstance3D.new()
+		_overlay_instance.mesh = _overlay_mesh
+		_overlay_instance.material_override = _overlay_mat
+		_overlay_instance.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		# INTERNAL_MODE_FRONT hides this from the scene tree panel
+		add_child(_overlay_instance, false, Node.INTERNAL_MODE_FRONT)
+
+	_overlay_mesh.clear_surfaces()
+	var skel := get_skeleton()
+	if skel == null or _config == null:
+		return
+
+	_overlay_mesh.surface_begin(Mesh.PRIMITIVE_LINES)
+
+	for sfx: String in [SUFFIX_L, SUFFIX_R]:
+		# ball joint — cone always centred on the bone's rest direction (basis.y)
+		var tr_idx := skel.find_bone(BONE_THIGH_ROLL + sfx)
+		if tr_idx >= 0:
+			var r := skel.get_bone_global_rest(tr_idx)
+			_ol_cone(r.origin, r.basis.y,
+					_config.thigh_roll_cone_deg, 0.14, Color(0.85, 0.2, 1.0))
+
+		# thigh hinge — axis in skeleton space
+		var thigh_idx := skel.find_bone(BONE_THIGH + sfx)
+		if thigh_idx < 0:
+			thigh_idx = skel.find_bone("tigh" + sfx)
+		if thigh_idx >= 0:
+			var r := skel.get_bone_global_rest(thigh_idx)
+			_ol_hinge(r.origin, _config.thigh_hinge_axis, r.basis.y,
+					_config.thigh_min_deg, _config.thigh_max_deg, 0.20, Color(0.15, 0.85, 1.0))
+
+		# shin hinge
+		var shin_idx := skel.find_bone(BONE_SHIN + sfx)
+		if shin_idx >= 0:
+			var r := skel.get_bone_global_rest(shin_idx)
+			_ol_hinge(r.origin, _config.shin_hinge_axis, r.basis.y,
+					_config.shin_min_deg, _config.shin_max_deg, 0.18, Color(0.15, 0.85, 1.0))
+
+		# cannon hinge
+		var cannon_idx := skel.find_bone(BONE_CANNON + sfx)
+		if cannon_idx >= 0:
+			var r := skel.get_bone_global_rest(cannon_idx)
+			_ol_hinge(r.origin, _config.cannon_hinge_axis, r.basis.y,
+					_config.cannon_min_deg, _config.cannon_max_deg, 0.15, Color(0.15, 0.85, 1.0))
+
+		# ankle_pitch hinge
+		var ap_idx := skel.find_bone(BONE_ANKLE_PITCH + sfx)
+		if ap_idx >= 0:
+			var r := skel.get_bone_global_rest(ap_idx)
+			_ol_hinge(r.origin, _config.ankle_pitch_hinge_axis, r.basis.y,
+					_config.ankle_pitch_min_deg, _config.ankle_pitch_max_deg, 0.12, Color(0.15, 0.85, 1.0))
+
+		# ankle_roll hinge
+		var ar_idx := skel.find_bone(BONE_ANKLE_ROLL + sfx)
+		if ar_idx >= 0:
+			var r := skel.get_bone_global_rest(ar_idx)
+			_ol_hinge(r.origin, _config.ankle_roll_hinge_axis, r.basis.y,
+					_config.ankle_roll_min_deg, _config.ankle_roll_max_deg, 0.10, Color(0.15, 0.85, 1.0))
+
+		# gait zone: step-trigger circle at foot level + step-height bar
+		if thigh_idx >= 0 and ar_idx >= 0:
+			var hip_xz := skel.get_bone_global_rest(thigh_idx).origin
+			var foot_y := skel.get_bone_global_rest(ar_idx).origin.y
+			var zone   := Vector3(hip_xz.x, foot_y, hip_xz.z)
+			_ol_circle_xz(zone, _config.step_trigger_dist, Color(1.0, 0.85, 0.1))
+			_ol_line(zone, zone + Vector3.UP * _config.step_height, Color(1.0, 0.5, 0.1))
+
+	_overlay_mesh.surface_end()
+
+
+func _ol_line(a: Vector3, b: Vector3, c: Color) -> void:
+	_overlay_mesh.surface_set_color(c)
+	_overlay_mesh.surface_add_vertex(a)
+	_overlay_mesh.surface_set_color(c)
+	_overlay_mesh.surface_add_vertex(b)
+
+
+# Fan arc: min_deg to max_deg around `axis`, rest direction at 0° is `rest_dir`.
+func _ol_hinge(origin: Vector3, axis: Vector3, rest_dir: Vector3,
+		min_deg: float, max_deg: float, radius: float, color: Color) -> void:
+	const STEPS := 24
+	var prev := origin + rest_dir.rotated(axis, deg_to_rad(min_deg)) * radius
+	_ol_line(origin, prev, color)
+	for i in range(1, STEPS + 1):
+		var p := origin + rest_dir.rotated(axis, lerpf(deg_to_rad(min_deg), deg_to_rad(max_deg), float(i) / STEPS)) * radius
+		_ol_line(prev, p, color)
+		prev = p
+	_ol_line(origin, prev, color)
+
+
+# Cone ring at `cone_deg` from `axis`, four spokes back to origin.
+func _ol_cone(origin: Vector3, axis: Vector3, cone_deg: float, radius: float, color: Color) -> void:
+	const STEPS := 32
+	var dir    := axis.normalized()
+	var centre := origin + dir * (cos(deg_to_rad(cone_deg)) * radius)
+	var cone_r := sin(deg_to_rad(cone_deg)) * radius
+	var perp   := dir.cross(Vector3.UP)
+	if perp.length() < 0.001:
+		perp = dir.cross(Vector3.RIGHT)
+	perp = perp.normalized()
+	var ring: Array[Vector3] = []
+	for i in STEPS:
+		ring.append(centre + perp.rotated(dir, float(i) / STEPS * TAU) * cone_r)
+	for i in STEPS:
+		_ol_line(ring[i], ring[(i + 1) % STEPS], color)
+	for i in [0, STEPS / 4, STEPS / 2, (3 * STEPS) / 4]:
+		_ol_line(origin, ring[i], color)
+
+
+# Flat circle in the XZ plane.
+func _ol_circle_xz(centre: Vector3, radius: float, color: Color) -> void:
+	const STEPS := 32
+	var prev := centre + Vector3(radius, 0.0, 0.0)
+	for i in range(1, STEPS + 1):
+		var a := float(i) / STEPS * TAU
+		var p := centre + Vector3(cos(a) * radius, 0.0, sin(a) * radius)
+		_ol_line(prev, p, color)
+		prev = p

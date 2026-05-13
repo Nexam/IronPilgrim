@@ -1,16 +1,17 @@
 [gd_scene format=3 uid="uid://dah0ic7r2c7an"]
 
 [ext_resource type="PackedScene" uid="uid://dxl72h4yv2d8h" path="res://assets/mech-mk2-rigged.glb" id="1_tox6t"]
-[ext_resource type="Script" uid="uid://crbmw8n5lvs2q" path="res://scripts/mech_config.gd" id="2_nmk4x"]
+[ext_resource type="Script" uid="uid://cf1xsb1iqbs21" path="res://scripts/mech_wiring.gd" id="2_nmk4x"]
 [ext_resource type="Material" uid="uid://sl1cmq81r1eo" path="res://assets/mech_material.tres" id="3_ruqfn"]
 [ext_resource type="Script" uid="uid://cawirynek8uwb" path="res://scripts/mech_digitigrade_rig.gd" id="3_uo7wk"]
+[ext_resource type="Resource" uid="uid://b3qciqgd5lt31" path="res://addons/mk2_config.tres" id="5_ruqfn"]
 
 [node name="mech-mk2-rigged" unique_id=928044897 node_paths=PackedStringArray("rig", "camera") instance=ExtResource("1_tox6t")]
 script = ExtResource("2_nmk4x")
 rig = NodePath("mech_armature/Skeleton3D/MechDigitigradeRig")
 camera = NodePath("mech_armature/Skeleton3D/BoneAttachment3D/Camera3D")
 
-[node name="Skeleton3D" parent="mech_armature" parent_id_path=PackedInt32Array(2067543897) index="1" unique_id=1008643129]
+[node name="Skeleton3D" parent="mech_armature" parent_id_path=PackedInt32Array(1842027971) index="1" unique_id=764476176]
 modifier_callback_mode_process = 0
 
 [node name="BoneAttachment3D" type="BoneAttachment3D" parent="mech_armature/Skeleton3D" index="0" unique_id=1007536150]
@@ -22,11 +23,11 @@ bone_idx = 2
 transform = Transform3D(-1, 0, -8.742275e-08, 0, 1.0000001, 0, 8.742275e-08, 0, -1, 1.418947e-07, 0.6776726, 0.29044485)
 cull_mask = 1048573
 
-[node name="Cube_001" parent="mech_armature/Skeleton3D" index="1" unique_id=1148987047]
+[node name="Cube_001" parent="mech_armature/Skeleton3D" index="1" unique_id=242993650]
 layers = 2
 surface_material_override/0 = ExtResource("3_ruqfn")
 
-[node name="Cylinder_004" parent="mech_armature/Skeleton3D" index="2" unique_id=2103710296]
+[node name="Cylinder_004" parent="mech_armature/Skeleton3D" index="2" unique_id=1771914952]
 surface_material_override/0 = ExtResource("3_ruqfn")
 
 [node name="MechDigitigradeRig" type="SkeletonModifier3D" parent="mech_armature/Skeleton3D" index="3" unique_id=325985680 node_paths=PackedStringArray("foot_ray_l", "foot_ray_r")]
@@ -49,6 +50,8 @@ influence = 1.0
 script = ExtResource("3_uo7wk")
 foot_ray_l = NodePath("../../../RayCast_Foot_L")
 foot_ray_r = NodePath("../../../RayCast_Foot_R")
+debug_draw = true
+config = ExtResource("5_ruqfn")
 metadata/_custom_type_script = "uid://cawirynek8uwb"
 
 [node name="RayCast_Foot_L" type="RayCast3D" parent="." index="1" unique_id=464520562]

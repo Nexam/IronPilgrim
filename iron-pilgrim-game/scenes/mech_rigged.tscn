@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://bc6kcjqn7fwrf"]
 
 [ext_resource type="PackedScene" uid="uid://bifsx63gh3dwg" path="res://assets/mech-rigged.glb" id="1_0vrc2"]
-[ext_resource type="Script" uid="uid://crbmw8n5lvs2q" path="res://scripts/mech_config.gd" id="2_o817y"]
+[ext_resource type="Script" uid="uid://cf1xsb1iqbs21" path="res://scripts/mech_wiring.gd" id="2_o817y"]
 [ext_resource type="Script" uid="uid://cawirynek8uwb" path="res://scripts/mech_digitigrade_rig.gd" id="2_wvjyj"]
 [ext_resource type="Material" uid="uid://sl1cmq81r1eo" path="res://assets/mech_material.tres" id="3_iieob"]
 

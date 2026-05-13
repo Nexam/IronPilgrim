@@ -15,6 +15,10 @@ run/main_scene="uid://bsle8opej6jgn"
 config/features=PackedStringArray("4.6", "Forward Plus")
 config/icon="res://icon.svg"
 
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/mech_rig_gizmo/plugin.cfg")
+
 [input]
 
 move_forward={
