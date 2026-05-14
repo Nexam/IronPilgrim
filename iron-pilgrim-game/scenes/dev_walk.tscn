@@ -1,27 +1,34 @@
 [gd_scene format=4 uid="uid://bsle8opej6jgn"]
 
-[ext_resource type="PackedScene" uid="uid://dah0ic7r2c7an" path="res://scenes/mech_mk_2_rigged.tscn" id="2_pvwu3"]
+[ext_resource type="Texture2D" uid="uid://bbdhjgoxqiy1t" path="res://assets/hdri/qwantani_dusk_2_4k.exr" id="1_j7i7u"]
+[ext_resource type="PackedScene" uid="uid://c6jus82e7yife" path="res://scenes/mech_mk_3.tscn" id="3_m2kco"]
 [ext_resource type="ArrayMesh" uid="uid://ldip3ehmfku5" path="res://assets/mech-blockout.obj" id="3_pvwu3"]
+[ext_resource type="Material" uid="uid://sl1cmq81r1eo" path="res://assets/mech_material.tres" id="5_06liw"]
 [ext_resource type="Script" uid="uid://bk0onibnrxl4x" path="res://scripts/mech_character_body_3d.gd" id="dev_walk_gd"]
 
-[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_j671i"]
-sky_top_color = Color(0.28400806, 0.43320608, 0.76098114, 1)
-sky_horizon_color = Color(0.7531115, 0.6143357, 0.62840915, 1)
-energy_multiplier = 6.7
+[sub_resource type="PanoramaSkyMaterial" id="PanoramaSkyMaterial_06liw"]
+panorama = ExtResource("1_j7i7u")
 
-[sub_resource type="Sky" id="Sky_oune1"]
-sky_material = SubResource("ProceduralSkyMaterial_j671i")
+[sub_resource type="Sky" id="Sky_m2kco"]
+sky_material = SubResource("PanoramaSkyMaterial_06liw")
 
 [sub_resource type="Environment" id="Environment_aqt6j"]
 background_mode = 2
-sky = SubResource("Sky_oune1")
+background_energy_multiplier = 2.1
+sky = SubResource("Sky_m2kco")
 ssao_enabled = true
+ssil_enabled = true
+glow_enabled = true
+glow_bloom = 0.05
 fog_density = 0.03
 fog_aerial_perspective = 0.1
 fog_sky_affect = 0.95
 volumetric_fog_enabled = true
-volumetric_fog_albedo = Color(0.7313704, 0.7897276, 0.86992, 1)
-volumetric_fog_emission = Color(0.2001439, 0.2801795, 0.47268683, 1)
+volumetric_fog_albedo = Color(0.8318101, 0.7850111, 0.8620915, 1)
+volumetric_fog_emission = Color(0.41828284, 0.4265104, 0.69408023, 1)
+volumetric_fog_emission_energy = 0.25
+volumetric_fog_ambient_inject = 0.1
+volumetric_fog_sky_affect = 0.95
 adjustment_enabled = true
 
 [sub_resource type="WorldBoundaryShape3D" id="WorldBoundaryShape3D_06liw"]
@@ -99,7 +106,10 @@ viewport_path = NodePath("SubViewport")
 environment = SubResource("Environment_aqt6j")
 
 [node name="DL-Sun" type="DirectionalLight3D" parent="." unique_id=300640364]
-transform = Transform3D(0.8299636, -0.24913217, 0.4990928, 0, 0.89472413, 0.44661948, -0.55781764, -0.37067792, 0.74258846, -4.9722595, 9.458532, 8.996429)
+transform = Transform3D(0.8770791, 0.21453184, -0.4297771, 1.6624261e-08, 0.8947239, 0.44661933, 0.4803458, -0.39172053, 0.7847438, -4.9722595, 9.458532, 8.996429)
+light_color = Color(0.9337946, 0.69186556, 0.574423, 1)
+light_energy = 1.778
+light_volumetric_fog_energy = 0.222
 shadow_enabled = true
 sky_mode = 1
 
@@ -114,24 +124,25 @@ debug_fill = false
 mesh = SubResource("QuadMesh_pvwu3")
 surface_material_override/0 = SubResource("StandardMaterial3D_j7i7u")
 
-[node name="CharacterBody3D" type="CharacterBody3D" parent="." unique_id=304978248 node_paths=PackedStringArray("mech_wiring")]
+[node name="CharacterBody3D" type="CharacterBody3D" parent="." unique_id=304978248 node_paths=PackedStringArray("camera")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.3701057, 0)
 collision_layer = 2
 floor_max_angle = 1.0471976
 script = ExtResource("dev_walk_gd")
 move_speed = 2.5
-mech_wiring = NodePath("mech-mk2-rigged")
+camera = NodePath("Camera3D")
+
+[node name="mech-mk3" parent="CharacterBody3D" unique_id=1268917733 instance=ExtResource("3_m2kco")]
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="CharacterBody3D" unique_id=582532766]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.0922847, 0)
 shape = SubResource("CapsuleShape3D_m2kco")
 
-[node name="mech-mk2-rigged" parent="CharacterBody3D" unique_id=928044897 node_paths=PackedStringArray("chassis") instance=ExtResource("2_pvwu3")]
-transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0, 0, 0)
-chassis = NodePath("..")
-
 [node name="Marker3D" type="Marker3D" parent="CharacterBody3D" unique_id=1272980618]
 gizmo_extents = 0.6
+
+[node name="Camera3D" type="Camera3D" parent="CharacterBody3D" unique_id=1332700593]
+transform = Transform3D(1, 0, 0, 0, 0.9941585, -0.10792995, 0, 0.10792995, 0.9941585, -2.8975348, 2.9652147, 5.2836294)
 
 [node name="obstacle" type="StaticBody3D" parent="." unique_id=251984102]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.8055332, 0.5274, -7.920167)
@@ -160,12 +171,22 @@ transform = Transform3D(4, 0, 0, 0, 3.8222265, -1.1792302, 0, 1.1792302, 3.82222
 mesh = SubResource("BoxMesh_j671i")
 surface_material_override/0 = SubResource("StandardMaterial3D_aqt6j")
 
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="random02" unique_id=26799980]
+transform = Transform3D(1, 0, 0, 0, 6.9526906, 0, 0, -1.1920929e-07, 0.23065093, -7.9291244, 0.15225792, -8.223113)
+mesh = SubResource("BoxMesh_j671i")
+surface_material_override/0 = SubResource("StandardMaterial3D_aqt6j")
+
 [node name="CollisionShape3D" type="CollisionShape3D" parent="random02" unique_id=42543191]
 shape = SubResource("BoxShape3D_aqt6j")
 
 [node name="mech-mockup" type="MeshInstance3D" parent="." unique_id=1622777061]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.0968776, 0.001149, -17.623678)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.0968776, 0.98174745, -17.623678)
 mesh = ExtResource("3_pvwu3")
+surface_material_override/0 = ExtResource("5_06liw")
+surface_material_override/1 = ExtResource("5_06liw")
+surface_material_override/2 = ExtResource("5_06liw")
+surface_material_override/3 = ExtResource("5_06liw")
+surface_material_override/4 = ExtResource("5_06liw")
 
 [node name="terrain-test" type="StaticBody3D" parent="." unique_id=436042344]
 

@@ -6,14 +6,12 @@ extends CharacterBody3D
 
 @export var move_speed := 5.0
 @export var mouse_sensitivity := 0.003
-@export var mech_wiring:MechWiring
-var camera: Camera3D
+@export var camera: Camera3D
 
 var gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
 var _mouse_pitch := 0.0
 
 func _ready() -> void:
-	camera = mech_wiring.camera
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -35,8 +33,12 @@ func _physics_process(delta: float) -> void:
 
 	var input_dir := Input.get_vector("move_left", "move_right", "move_forward", "move_backward")
 	var direction := (transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
-
-	velocity.x = direction.x * move_speed
-	velocity.z = direction.z * move_speed
+	var speed_mult = 1.0
+	
+	if Input.is_action_pressed("sprint"):
+		speed_mult = 2.0
+	
+	velocity.x = direction.x * move_speed * speed_mult
+	velocity.z = direction.z * move_speed * speed_mult
 
 	move_and_slide()

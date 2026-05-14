@@ -4,30 +4,34 @@
 [ext_resource type="Script" uid="uid://cf1xsb1iqbs21" path="res://scripts/mech_wiring.gd" id="2_nmk4x"]
 [ext_resource type="Material" uid="uid://sl1cmq81r1eo" path="res://assets/mech_material.tres" id="3_ruqfn"]
 [ext_resource type="Script" uid="uid://cawirynek8uwb" path="res://scripts/mech_digitigrade_rig.gd" id="3_uo7wk"]
+[ext_resource type="Shader" uid="uid://u5evxuccuoyh" path="res://scenes/mech_mk_2_rigged.tres" id="3_wk5dk"]
 [ext_resource type="Resource" uid="uid://b3qciqgd5lt31" path="res://addons/mk2_config.tres" id="5_ruqfn"]
 
-[node name="mech-mk2-rigged" unique_id=928044897 node_paths=PackedStringArray("rig", "camera") instance=ExtResource("1_tox6t")]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_hjsa6"]
+render_priority = 0
+shader = ExtResource("3_wk5dk")
+
+[node name="mech-mk2-rigged" unique_id=1268917733 node_paths=PackedStringArray("rig", "camera") instance=ExtResource("1_tox6t")]
 script = ExtResource("2_nmk4x")
 rig = NodePath("mech_armature/Skeleton3D/MechDigitigradeRig")
 camera = NodePath("mech_armature/Skeleton3D/BoneAttachment3D/Camera3D")
 
-[node name="Skeleton3D" parent="mech_armature" parent_id_path=PackedInt32Array(1842027971) index="1" unique_id=764476176]
+[node name="Skeleton3D" parent="mech_armature" parent_id_path=PackedInt32Array(405754661) index="1" unique_id=1852586249]
 modifier_callback_mode_process = 0
 
 [node name="BoneAttachment3D" type="BoneAttachment3D" parent="mech_armature/Skeleton3D" index="0" unique_id=1007536150]
-transform = Transform3D(1, 0, 2.3841855e-07, 0, 0.99999994, 0, -2.3841855e-07, 0, 1, 8.108072e-08, 2.3546157, 0.33719313)
+transform = Transform3D(-1, 0, -6.278329e-07, 0, 0.99999994, 0, 6.278329e-07, 0, -1, -1.9095219e-07, 2.3546157, -0.33719313)
 bone_name = "torso"
 bone_idx = 2
 
 [node name="Camera3D" type="Camera3D" parent="mech_armature/Skeleton3D/BoneAttachment3D" index="0" unique_id=523330750]
-transform = Transform3D(-1, 0, -8.742275e-08, 0, 1.0000001, 0, 8.742275e-08, 0, -1, 1.418947e-07, 0.6776726, 0.29044485)
-cull_mask = 1048573
+transform = Transform3D(-1, -1.8377017e-07, -1.1492017e-07, -2.0935926e-07, 0.95620275, 0.2927055, 5.609644e-08, 0.29270554, -0.9562026, 2.6661778e-06, 1.5799439, -3.6074162)
 
-[node name="Cube_001" parent="mech_armature/Skeleton3D" index="1" unique_id=242993650]
+[node name="Cube_001" parent="mech_armature/Skeleton3D" index="1" unique_id=1897115291]
 layers = 2
-surface_material_override/0 = ExtResource("3_ruqfn")
+surface_material_override/0 = SubResource("ShaderMaterial_hjsa6")
 
-[node name="Cylinder_004" parent="mech_armature/Skeleton3D" index="2" unique_id=1771914952]
+[node name="Cylinder_004" parent="mech_armature/Skeleton3D" index="2" unique_id=502051309]
 surface_material_override/0 = ExtResource("3_ruqfn")
 
 [node name="MechDigitigradeRig" type="SkeletonModifier3D" parent="mech_armature/Skeleton3D" index="3" unique_id=325985680 node_paths=PackedStringArray("foot_ray_l", "foot_ray_r")]
@@ -55,11 +59,11 @@ config = ExtResource("5_ruqfn")
 metadata/_custom_type_script = "uid://cawirynek8uwb"
 
 [node name="RayCast_Foot_L" type="RayCast3D" parent="." index="1" unique_id=464520562]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.6962352, 0, 0.5368401)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.7, 0, -0.7)
 target_position = Vector3(0, -6, 0)
 hit_from_inside = true
 
 [node name="RayCast_Foot_R" type="RayCast3D" parent="." index="2" unique_id=292703179]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.690915, 0, 0.5368401)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.7, 0, -0.7)
 target_position = Vector3(0, -6, 0)
 hit_from_inside = true

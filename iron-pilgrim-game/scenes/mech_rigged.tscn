@@ -39,9 +39,6 @@ influence = 1.0
 script = ExtResource("2_wvjyj")
 foot_ray_l = NodePath("../../../RayCast_Foot_L")
 foot_ray_r = NodePath("../../../RayCast_Foot_R")
-foot_height = 0.36
-step_trigger_dist = 1.6
-step_height = 0.6
 debug_draw = true
 metadata/_custom_type_script = "uid://cawirynek8uwb"
 

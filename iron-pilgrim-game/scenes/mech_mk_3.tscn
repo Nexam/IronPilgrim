@@ -1,0 +1,111 @@
+[gd_scene format=3 uid="uid://c6jus82e7yife"]
+
+[ext_resource type="PackedScene" uid="uid://dxl72h4yv2d8h" path="res://assets/mech-mk2-rigged.glb" id="1_ilgpw"]
+[ext_resource type="Script" uid="uid://csjab2k60n4yd" path="res://scripts/mech_mk_3.gd" id="2_yl7we"]
+[ext_resource type="Script" uid="uid://dq0mi1tofk4e" path="res://scripts/step_planner.gd" id="3_8deia"]
+[ext_resource type="Script" uid="uid://d3eua3fke26sl" path="res://scripts/mech_skeleton_driver.gd" id="3_bsi3e"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_bsi3e"]
+albedo_color = Color(0.4115968, 0.59982, 0.29179016, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_jmupy"]
+albedo_color = Color(0.19114077, 0.35849324, 0.16053122, 1)
+
+[sub_resource type="PrismMesh" id="PrismMesh_ilgpw"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_yl7we"]
+albedo_color = Color(0.9165408, 0.28396517, 0.038539447, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_8deia"]
+albedo_color = Color(0, 0.53364253, 0.975491, 1)
+
+[sub_resource type="PrismMesh" id="PrismMesh_8deia"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_q1ij5"]
+albedo_color = Color(1.1358858e-05, 0.910881, 0.53399074, 1)
+
+[node name="mech-mk2-rigged" unique_id=1638710925 instance=ExtResource("1_ilgpw")]
+script = ExtResource("2_yl7we")
+
+[node name="Cube_001" parent="mech_armature/Skeleton3D" parent_id_path=PackedInt32Array(518136165) index="0" unique_id=1433710403]
+surface_material_override/0 = SubResource("StandardMaterial3D_bsi3e")
+
+[node name="Cylinder_004" parent="mech_armature/Skeleton3D" parent_id_path=PackedInt32Array(518136165) index="1" unique_id=927026392]
+surface_material_override/0 = SubResource("StandardMaterial3D_jmupy")
+
+[node name="MechSkeletonDriver" type="SkeletonModifier3D" parent="mech_armature/Skeleton3D" parent_id_path=PackedInt32Array(518136165) index="2" unique_id=1178697208 node_paths=PackedStringArray("pelvis_target", "left_foot_target", "right_foot_target")]
+unique_name_in_owner = false
+process_mode = 0
+process_priority = 0
+process_physics_priority = 0
+process_thread_group = 0
+physics_interpolation_mode = 0
+auto_translate_mode = 0
+editor_description = ""
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+rotation_edit_mode = 0
+rotation_order = 2
+top_level = false
+visible = true
+visibility_parent = NodePath("")
+active = true
+influence = 1.0
+script = ExtResource("3_bsi3e")
+pelvis_target = NodePath("../../../Pelvis Debug")
+left_foot_target = NodePath("../../../foot_debug_L")
+right_foot_target = NodePath("../../../foot_debug_R")
+metadata/_custom_type_script = "uid://d3eua3fke26sl"
+
+[node name="foot_debug_R" type="Node3D" parent="." index="1" unique_id=222108734]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.7029075, 0, -0.7376461)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="foot_debug_R" index="0" unique_id=1742517944]
+transform = Transform3D(0.6, 0, 0, 0, 0.2, 0, 0, 0, 0.6, 0, 0.09708789, 0)
+mesh = SubResource("PrismMesh_ilgpw")
+surface_material_override/0 = SubResource("StandardMaterial3D_yl7we")
+
+[node name="foot_debug_L" type="Node3D" parent="." index="2" unique_id=580783982]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.7049554, 0, -0.7376461)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="foot_debug_L" index="0" unique_id=607626051]
+transform = Transform3D(0.6, 0, 0, 0, 0.2, 0, 0, 0, 0.6, 0, 0.09708789, 0)
+mesh = SubResource("PrismMesh_ilgpw")
+surface_material_override/0 = SubResource("StandardMaterial3D_8deia")
+
+[node name="Pelvis Debug" type="Node3D" parent="." index="3" unique_id=355073640]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.82, -0.34184992)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Pelvis Debug" index="0" unique_id=1837865503]
+transform = Transform3D(0.425, 0, 0, 0, 0.425, 0, 0, 0, 1.305, 0, 0.09708789, 0)
+mesh = SubResource("PrismMesh_8deia")
+surface_material_override/0 = SubResource("StandardMaterial3D_q1ij5")
+
+[node name="raycast_foot_L" type="RayCast3D" parent="." index="4" unique_id=1071141514]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.7, 0, -0.7)
+target_position = Vector3(0, -6, 0)
+
+[node name="raycast_foot_R" type="RayCast3D" parent="." index="5" unique_id=1032491182]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.7, 0, -0.7)
+target_position = Vector3(0, -6, 0)
+
+[node name="StepsPlanner" type="Node3D" parent="." index="6" unique_id=867662409 node_paths=PackedStringArray("left_debug", "left_raycast", "left_offset", "right_debug", "right_raycast", "right_offset", "pelvis_debug")]
+script = ExtResource("3_8deia")
+left_debug = NodePath("../foot_debug_L")
+left_raycast = NodePath("../raycast_foot_L")
+left_offset = NodePath("../foot_offset_L")
+right_debug = NodePath("../foot_debug_R")
+right_raycast = NodePath("../raycast_foot_R")
+right_offset = NodePath("../foot_offset_R")
+pelvis_debug = NodePath("../Pelvis Debug")
+forward_trigger_dist = 0.9
+backward_trigger_dist = 1.0
+side_trigger_dist = 0.45
+step_duration = 0.42
+step_height = 0.4
+max_step_lead_speed = 3.5
+
+[node name="foot_offset_L" type="Marker3D" parent="." index="7" unique_id=417400396]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.7, 0, -0.7)
+
+[node name="foot_offset_R" type="Marker3D" parent="." index="8" unique_id=686586530]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.7, 0, -0.7)

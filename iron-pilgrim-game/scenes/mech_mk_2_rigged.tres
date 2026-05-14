@@ -1,0 +1,16 @@
+[gd_resource type="VisualShader" format=3 uid="uid://u5evxuccuoyh"]
+
+[sub_resource type="VisualShaderNodeColorConstant" id="VisualShaderNodeColorConstant_i7r2e"]
+constant = Color(0.65393436, 0.27849734, 0.111562006, 1)
+
+[sub_resource type="VisualShaderNodeInput" id="VisualShaderNodeInput_5l0si"]
+input_name = "vertex"
+
+[resource]
+nodes/vertex/0/position = Vector2(580, 140)
+nodes/vertex/2/node = SubResource("VisualShaderNodeInput_5l0si")
+nodes/vertex/2/position = Vector2(-180, 120)
+nodes/vertex/connections = PackedInt32Array(2, 0, 0, 0)
+nodes/fragment/2/node = SubResource("VisualShaderNodeColorConstant_i7r2e")
+nodes/fragment/2/position = Vector2(-74.99982, 191.00009)
+nodes/fragment/connections = PackedInt32Array(2, 0, 0, 0)

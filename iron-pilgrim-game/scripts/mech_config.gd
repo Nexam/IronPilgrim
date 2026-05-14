@@ -4,7 +4,7 @@ class_name MechConfig
 @export_group("IK")
 @export var knee_pole := Vector3.FORWARD
 @export var max_drop := 3.0
-@export_range(0.0, 1.5, 0.01) var foot_height := 0.2
+@export_range(0.0, 1.5, 0.01) var foot_height := 0.23
 @export_range(0.0, 80.0, 0.5) var cannon_pitch_folded := 55.0
 @export_range(0.0, 80.0, 0.5) var cannon_pitch_extended := 15.0
 
@@ -16,43 +16,28 @@ class_name MechConfig
 @export var step_min_interval := 0.15
 @export var yaw_replant_deg := 18.0
 
-# Angles are relative to each bone's rest pose (+Y direction = 0°).
-# Hinge axes are in local bone space: (1,0,0) = local X, (0,1,0) = local Y,
-# (0,0,1) = local Z. Adjust axes until the arcs match in-game joint motion.
-
+# Hinge axes are in skeleton space.
+# (1,0,0) = lateral X, (0,1,0) = up, (0,0,1) = +Z (rear, since -Z is forward).
 @export_group("Constraint Axes")
-# Axes are in skeleton space (the skeleton node's local frame), not bone-local.
-# (1,0,0) = skeleton X (lateral),  (0,1,0) = skeleton Y (up),
-# (0,0,1) = skeleton Z (forward).  Negate to flip the arc's positive direction.
-# The ball-joint cone is always centred on the bone's rest direction — no axis needed.
-@export var thigh_hinge_axis       := Vector3(1, 0, 0)
-@export var shin_hinge_axis        := Vector3(1, 0, 0)
-@export var cannon_hinge_axis      := Vector3(1, 0, 0)
-@export var ankle_pitch_hinge_axis := Vector3(1, 0, 0)
-@export var ankle_roll_hinge_axis  := Vector3(0, 0, 1)
+@export var shin_hinge_axis   := Vector3(1, 0, 0)
+@export var cannon_hinge_axis := Vector3(1, 0, 0)
 
-@export_group("Constraints / thigh_roll")
-@export_range(0.0, 90.0, 0.5) var thigh_roll_cone_deg := 40.0
-@export_range(-90.0, 0.0, 0.5) var thigh_roll_twist_min_deg := -20.0
-@export_range(0.0, 90.0, 0.5) var thigh_roll_twist_max_deg := 20.0
-
+# Ball joint at the hip. Yaw is *not* clamped by this cone — instead, the IK
+# constrains the knee to a plane perpendicular to skel-X through the hock, so
+# the thigh only yaws when the foot itself moves laterally (strafing). The cone
+# is just a safety net against degenerate aims.
 @export_group("Constraints / thigh")
-@export_range(-180.0, 180.0, 0.5) var thigh_min_deg := -120.0
-@export_range(-180.0, 180.0, 0.5) var thigh_max_deg := 30.0
+@export_range(0.0, 180.0, 0.5) var thigh_cone_deg := 90.0
 
 @export_group("Constraints / shin")
-@export_range(-180.0, 180.0, 0.5) var shin_min_deg := 0.0
-@export_range(-180.0, 180.0, 0.5) var shin_max_deg := 150.0
+@export_range(-180.0, 180.0, 0.5) var shin_min_deg := -106.5
+@export_range(-180.0, 180.0, 0.5) var shin_max_deg := 19.5
 
 @export_group("Constraints / cannon")
-@export_range(-180.0, 180.0, 0.5) var cannon_min_deg := -60.0
-@export_range(-180.0, 180.0, 0.5) var cannon_max_deg := 60.0
+@export_range(-180.0, 180.0, 0.5) var cannon_min_deg := -28.5
+@export_range(-180.0, 180.0, 0.5) var cannon_max_deg := 119.5
 
-@export_group("Constraints / ankle_pitch")
-@export_range(-90.0, 90.0, 0.5) var ankle_pitch_min_deg := -30.0
-@export_range(-90.0, 90.0, 0.5) var ankle_pitch_max_deg := 30.0
-
-@export_group("Constraints / ankle_roll")
-# ankle_roll rotates around the bone's local Z (forward) axis, not X.
-@export_range(-90.0, 90.0, 0.5) var ankle_roll_min_deg := -25.0
-@export_range(-90.0, 90.0, 0.5) var ankle_roll_max_deg := 25.0
+# Ball joint at the ankle: aims along ground-tangent forward; cone limits tilt
+# out of the (parent-rotated) rest direction so the foot doesn't whip on slopes.
+@export_group("Constraints / foot")
+@export_range(0.0, 180.0, 0.5) var foot_cone_deg := 60.0
