@@ -31,9 +31,16 @@ class Leg:
 @export var pelvis_target: Node3D
 @export var left_foot_target: Node3D
 @export var right_foot_target: Node3D
+@export var torso_target: Node3D
 
 @export_category("Pelvis")
 @export var pelvis_bone_name := "pelvis"
+
+@export_category("Torso")
+@export var torso_bone_name := "torso"
+@export var torso_rotation_correction := Vector3.ZERO
+
+
 
 @export_category("Left leg bones")
 @export var left_thigh_bone_name := "thigh.L"
@@ -52,28 +59,34 @@ class Leg:
 @export var thigh_aim_axis := Vector3.UP
 @export var shin_aim_axis := Vector3.UP
 
-@export_category("Left corrections")
+@export_group("Left corrections")
 @export var left_thigh_rotation_correction := Vector3.ZERO
 @export var left_shin_rotation_correction := Vector3.ZERO
 @export var left_cannon_rotation_correction := Vector3(0.0, 90.0, 0.0)
 @export var left_foot_rotation_correction := Vector3(0.0, 0.0, -90.0)
 
-@export_category("Right corrections")
+@export_group("Right corrections")
 @export var right_thigh_rotation_correction := Vector3.ZERO
 @export var right_shin_rotation_correction := Vector3.ZERO
 @export var right_cannon_rotation_correction := Vector3(0.0, 90.0, 0.0)
 @export var right_foot_rotation_correction := Vector3(0.0, 0.0, -90.0)
 
+@export_group("Other corrections")
+@export var pelvis_rotation_correction := Vector3.ZERO
+
 @export_category("Debug")
 @export var draw_debug := true
 
 var pelvis_bone_id := -1
+var torso_bone_id := -1
+
 var left_leg: Leg
 var right_leg: Leg
 
 
 func _ready() -> void:
 	pelvis_bone_id = _find_bone_id(pelvis_bone_name)
+	torso_bone_id = _find_bone_id(torso_bone_name)
 
 	left_leg = _create_leg(
 		left_foot_target,
@@ -105,7 +118,7 @@ func _process_modification() -> void:
 		return
 
 	_drive_pelvis()
-
+	_drive_torso()
 	_solve_leg(left_leg)
 	_solve_leg(right_leg)
 
@@ -113,7 +126,32 @@ func _process_modification() -> void:
 		_debug_leg(left_leg, Color.RED, Color.YELLOW, Color.CYAN)
 		_debug_leg(right_leg, Color.ORANGE, Color.GREEN, Color.BLUE)
 
+func _drive_torso() -> void:
+	if torso_bone_id == -1 or torso_target == null:
+		return
 
+	var skeleton := get_skeleton()
+	var skeleton_inv := skeleton.global_transform.affine_inverse()
+
+	var target_basis_skeleton := skeleton_inv.basis * torso_target.global_transform.basis
+	target_basis_skeleton *= _basis_from_degrees(torso_rotation_correction)
+
+	var parent_id := skeleton.get_bone_parent(torso_bone_id)
+	var parent_global_pose := Transform3D.IDENTITY
+
+	if parent_id != -1:
+		parent_global_pose = skeleton.get_bone_global_pose(parent_id)
+
+	var current_global_pose := skeleton.get_bone_global_pose(torso_bone_id)
+	current_global_pose.basis = target_basis_skeleton
+
+	var local_pose := parent_global_pose.affine_inverse() * current_global_pose
+
+	skeleton.set_bone_pose_rotation(
+		torso_bone_id,
+		local_pose.basis.get_rotation_quaternion()
+	)
+	
 func _create_leg(
 	foot_target: Node3D,
 	thigh_name: String,
@@ -232,10 +270,12 @@ func _drive_pelvis() -> void:
 
 	var target_global_pose := skeleton.get_bone_global_pose(pelvis_bone_id)
 	target_global_pose.origin = target_in_skeleton_space
+	target_global_pose.basis = skeleton_inv.basis * pelvis_target.global_transform.basis
+	target_global_pose.basis  *= _basis_from_degrees(pelvis_rotation_correction)
 
 	var local_pose := parent_global_pose.affine_inverse() * target_global_pose
 	skeleton.set_bone_pose_position(pelvis_bone_id, local_pose.origin)
-
+	skeleton.set_bone_pose_rotation(pelvis_bone_id,	local_pose.basis.get_rotation_quaternion())
 
 func _solve_two_bone_joint_position(
 	root_pos: Vector3,

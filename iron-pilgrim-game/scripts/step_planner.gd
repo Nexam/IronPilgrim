@@ -28,21 +28,36 @@ class Foot:
 @export var right_offset: Marker3D
 
 @export var pelvis_debug: Node3D
+@export var torso_debug: Node3D
 
 @export_category("Triggers")
 @export var forward_trigger_dist := 0.85
 @export var backward_trigger_dist := 1.1
 @export var side_trigger_dist := 0.6
 
-@export_category("Step config")
+@export_category("Step motion")
 @export var step_duration := 0.38
 @export var step_height := 0.45
 @export var step_lead_distance := 0.8
 @export var max_step_lead_speed := 5.0
 
-@export_category("Pelvis debug")
+@export_category("Pelvis motion")
 @export var pelvis_height := 2.0
-@export var pelvis_follow_speed := 8.0
+@export var pelvis_follow_speed := 6.0
+@export var pelvis_support_shift := 0.18
+@export var pelvis_step_lift := 0.12
+@export var pelvis_velocity_lag := 0.12
+
+@export_category("Pelvis rotation")
+@export var pelvis_roll_amount := 4.0
+@export var pelvis_pitch_amount := 3.0
+@export var pelvis_rotation_follow_speed := 6.0
+
+
+@export_category("Torso motion")
+@export var torso_height := 1.0
+@export var torso_rotation_follow_speed := 5.0
+@export var torso_horizon_stabilization := 0.65
 
 var left_foot: Foot
 var right_foot: Foot
@@ -60,8 +75,44 @@ func _physics_process(delta: float) -> void:
 	_update_foot(left_foot, right_foot, delta)
 	_update_foot(right_foot, left_foot, delta)
 	_update_pelvis_debug(delta)
+	_update_torso_debug(delta)
 
+func _update_torso_debug(delta: float) -> void:
+	if torso_debug == null or pelvis_debug == null:
+		return
 
+	# Hard-attached to pelvis: no sliding.
+	torso_debug.global_position = (
+		pelvis_debug.global_position
+		+ pelvis_debug.global_transform.basis.y.normalized() * torso_height
+	)
+
+	var target_basis := _get_torso_target_basis()
+	var rot_weight := 1.0 - exp(-torso_rotation_follow_speed * delta)
+
+	torso_debug.global_basis = torso_debug.global_basis.slerp(target_basis, rot_weight)
+	
+func _get_torso_target_basis() -> Basis:
+	var pelvis_basis := pelvis_debug.global_transform.basis
+
+	var pelvis_forward := -pelvis_basis.z
+	pelvis_forward.y = 0.0
+
+	if pelvis_forward.length() < 0.001:
+		pelvis_forward = -body.global_transform.basis.z
+		pelvis_forward.y = 0.0
+
+	if pelvis_forward.length() < 0.001:
+		return pelvis_basis
+
+	pelvis_forward = pelvis_forward.normalized()
+
+	var leveled_right := pelvis_forward.cross(Vector3.UP).normalized()
+	var leveled_up := Vector3.UP
+	var leveled_basis := Basis(leveled_right, leveled_up, -pelvis_forward)
+
+	return pelvis_basis.slerp(leveled_basis, torso_horizon_stabilization)
+	
 func _create_foot(debug: Node3D, raycast: RayCast3D, offset: Marker3D) -> Foot:
 	var foot := Foot.new()
 	foot.debug = debug
@@ -216,15 +267,64 @@ func _update_pelvis_debug(delta: float) -> void:
 	if pelvis_debug == null:
 		return
 
-	var target := _get_pelvis_target_position()
-	var weight := 1.0 - exp(-pelvis_follow_speed * delta)
+	var target_pos := _get_pelvis_target_position()
+	var pos_weight := 1.0 - exp(-pelvis_follow_speed * delta)
+	pelvis_debug.global_position = pelvis_debug.global_position.lerp(target_pos, pos_weight)
 
-	pelvis_debug.global_position = pelvis_debug.global_position.lerp(target, weight)
+	var target_basis := _get_pelvis_target_basis()
+	var rot_weight := 1.0 - exp(-pelvis_rotation_follow_speed * delta)
+	pelvis_debug.global_basis = pelvis_debug.global_basis.slerp(target_basis, rot_weight)
 
+func _get_pelvis_target_basis() -> Basis:
+	var velocity := body.physic_body.velocity
+	velocity.y = 0.0
 
+	var speed_factor: float = clampf(velocity.length() / max_step_lead_speed, 0.0, 1.0)
+
+	var roll := 0.0
+	var pitch := 0.0
+
+	if left_foot.is_stepping and not right_foot.is_stepping:
+		roll = deg_to_rad(-pelvis_roll_amount)
+	elif right_foot.is_stepping and not left_foot.is_stepping:
+		roll = deg_to_rad(pelvis_roll_amount)
+
+	if velocity.length() > 0.05:
+		pitch = deg_to_rad(-pelvis_pitch_amount) * speed_factor
+
+	var body_basis := body.global_transform.basis
+	var rot := Basis(body_basis.x.normalized(), body_basis.y.normalized(), body_basis.z.normalized())
+
+	rot = rot * Basis(Vector3.FORWARD, roll)
+	rot = rot * Basis(Vector3.RIGHT, pitch)
+
+	return rot
 func _get_pelvis_target_position() -> Vector3:
+	if body == null or body.physic_body == null:
+		return Vector3.ZERO
 	var left_pos := left_foot.debug.global_position
 	var right_pos := right_foot.debug.global_position
 
 	var midpoint := (left_pos + right_pos) * 0.5
-	return midpoint + Vector3.UP * pelvis_height
+
+	var support_pos := midpoint
+
+	if left_foot.is_stepping and not right_foot.is_stepping:
+		support_pos = right_foot.planted_pos
+	elif right_foot.is_stepping and not left_foot.is_stepping:
+		support_pos = left_foot.planted_pos
+
+	var shifted_pos := midpoint.lerp(support_pos, pelvis_support_shift)
+
+	var velocity := body.physic_body.velocity
+	velocity.y = 0.0
+
+	var lag := Vector3.ZERO
+	if velocity.length() > 0.05:
+		lag = -velocity.normalized() * pelvis_velocity_lag
+
+	var step_lift := 0.0
+	if left_foot.is_stepping or right_foot.is_stepping:
+		step_lift = pelvis_step_lift
+
+	return shifted_pos + lag + Vector3.UP * (pelvis_height + step_lift)
