@@ -1,12 +1,22 @@
-[gd_resource type="StandardMaterial3D" format=3 uid="uid://sl1cmq81r1eo"]
+[gd_resource type="ShaderMaterial" format=3 uid="uid://sl1cmq81r1eo"]
+
+[ext_resource type="Material" uid="uid://xevk2k2pdnvn" path="res://assets/outline_material.tres" id="1_7bwv3"]
+[ext_resource type="Shader" uid="uid://b8pgovlnuwcsc" path="res://assets/moebius_main_mk2.gdshader" id="2_7bwv3"]
+[ext_resource type="Texture2D" uid="uid://cmedbpxj2a5vv" path="res://assets/dot_pattern_01.png" id="3_6onbf"]
 
 [resource]
-diffuse_mode = 3
-specular_mode = 1
-albedo_color = Color(0.37558305, 0.41761103, 0.3862789, 1)
-metallic = 0.15
-metallic_specular = 0.77
-roughness = 0.16
-clearcoat = 0.03
-clearcoat_roughness = 1.0
-refraction_scale = 0.79
+render_priority = 0
+next_pass = ExtResource("1_7bwv3")
+shader = ExtResource("2_7bwv3")
+shader_parameter/gradient_origin_y = 0.0
+shader_parameter/gradient_height = 2.07
+shader_parameter/gradient_contrast = 2.0
+shader_parameter/bottom_color = Color(0.66645736, 0.2820783, 0.13220456, 1)
+shader_parameter/top_color = Color(0.9681491, 0.7605854, 0.37282383, 1)
+shader_parameter/shadow_color = Color(1, 1, 1, 1)
+shader_parameter/toon_edge = 0.5
+shader_parameter/toon_softness = 0.0250000011875
+shader_parameter/use_uv_pattern = true
+shader_parameter/pattern_texture = ExtResource("3_6onbf")
+shader_parameter/pattern_scale = 4.0
+shader_parameter/pattern_strength = 0.2999999932944

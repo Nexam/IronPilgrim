@@ -4,12 +4,7 @@
 [ext_resource type="Script" uid="uid://csjab2k60n4yd" path="res://scripts/mech_mk_3.gd" id="2_yl7we"]
 [ext_resource type="Script" uid="uid://dq0mi1tofk4e" path="res://scripts/step_planner.gd" id="3_8deia"]
 [ext_resource type="Script" uid="uid://d3eua3fke26sl" path="res://scripts/mech_skeleton_driver.gd" id="3_bsi3e"]
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_bsi3e"]
-albedo_color = Color(0.41130003, 0.6, 0.29400003, 1)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_jmupy"]
-albedo_color = Color(0.19114077, 0.35849324, 0.16053122, 1)
+[ext_resource type="Material" uid="uid://sl1cmq81r1eo" path="res://assets/mech_material.tres" id="3_jmupy"]
 
 [sub_resource type="PrismMesh" id="PrismMesh_ilgpw"]
 
@@ -34,13 +29,13 @@ albedo_color = Color(1.1358858e-05, 0.910881, 0.53399074, 1)
 [node name="mech-mk2-rigged" unique_id=1638710925 instance=ExtResource("1_ilgpw")]
 script = ExtResource("2_yl7we")
 
-[node name="Cube_001" parent="mech_armature/Skeleton3D" parent_id_path=PackedInt32Array(1869482507) index="0" unique_id=1718718778]
-surface_material_override/0 = SubResource("StandardMaterial3D_bsi3e")
+[node name="Cube_001" parent="mech_armature/Skeleton3D" parent_id_path=PackedInt32Array(518136165) index="0" unique_id=1433710403]
+surface_material_override/0 = ExtResource("3_jmupy")
 
-[node name="Cylinder_004" parent="mech_armature/Skeleton3D" parent_id_path=PackedInt32Array(1869482507) index="1" unique_id=581858444]
-surface_material_override/0 = SubResource("StandardMaterial3D_jmupy")
+[node name="Cylinder_004" parent="mech_armature/Skeleton3D" parent_id_path=PackedInt32Array(518136165) index="1" unique_id=927026392]
+surface_material_override/0 = ExtResource("3_jmupy")
 
-[node name="MechSkeletonDriver" type="SkeletonModifier3D" parent="mech_armature/Skeleton3D" parent_id_path=PackedInt32Array(1869482507) index="2" unique_id=1178697208 node_paths=PackedStringArray("pelvis_target", "left_foot_target", "right_foot_target", "torso_target")]
+[node name="MechSkeletonDriver" type="SkeletonModifier3D" parent="mech_armature/Skeleton3D" parent_id_path=PackedInt32Array(518136165) index="2" unique_id=1178697208 node_paths=PackedStringArray("pelvis_target", "left_foot_target", "right_foot_target", "torso_target")]
 unique_name_in_owner = false
 process_mode = 0
 process_priority = 0
@@ -63,6 +58,9 @@ left_foot_target = NodePath("../../../foot_debug_L")
 right_foot_target = NodePath("../../../foot_debug_R")
 torso_target = NodePath("../../../torso_debug")
 torso_rotation_correction = Vector3(0, 90, 0)
+cannon_preferred_dir_local = Vector3(0, 1, 0.3)
+left_foot_rotation_correction = Vector3(0, 90, -90)
+right_foot_rotation_correction = Vector3(0, 90, -90)
 pelvis_rotation_correction = Vector3(0, 90, 0)
 metadata/_custom_type_script = "uid://d3eua3fke26sl"
 
@@ -71,6 +69,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.7029075, 0, -0.7376461)
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="foot_debug_R" index="0" unique_id=1742517944]
 transform = Transform3D(0.6, 0, 0, 0, 0.2, 0, 0, 0, 0.6, 0, 0.09708789, 0)
+visible = false
 mesh = SubResource("PrismMesh_ilgpw")
 surface_material_override/0 = SubResource("StandardMaterial3D_yl7we")
 
@@ -79,6 +78,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.7049554, 0, -0.7376461)
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="foot_debug_L" index="0" unique_id=607626051]
 transform = Transform3D(0.6, 0, 0, 0, 0.2, 0, 0, 0, 0.6, 0, 0.09708789, 0)
+visible = false
 mesh = SubResource("PrismMesh_ilgpw")
 surface_material_override/0 = SubResource("StandardMaterial3D_8deia")
 
@@ -86,16 +86,19 @@ surface_material_override/0 = SubResource("StandardMaterial3D_8deia")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.068211, -0.34184992)
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="torso_debug" index="0" unique_id=1133217079]
+visible = false
 mesh = SubResource("BoxMesh_bsi3e")
 surface_material_override/0 = SubResource("StandardMaterial3D_lqbcs")
 
 [node name="MeshInstance3D2" type="MeshInstance3D" parent="torso_debug" index="1" unique_id=385580164]
 transform = Transform3D(0.485, 0, 0, 0, 0.485, 0, 0, 0, 0.485, 0, 0, 0.5234301)
+visible = false
 mesh = SubResource("BoxMesh_bsi3e")
 surface_material_override/0 = SubResource("StandardMaterial3D_lqbcs")
 
 [node name="MeshInstance3D3" type="MeshInstance3D" parent="torso_debug" index="2" unique_id=77547152]
 transform = Transform3D(0.485, 0, 0, 0, 0.485, 0, 0, 0, 0.485, 0, 0.36376405, 0.02774617)
+visible = false
 mesh = SubResource("PrismMesh_bsi3e")
 surface_material_override/0 = SubResource("StandardMaterial3D_lqbcs")
 
@@ -104,6 +107,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.82, -0.34184992)
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Pelvis Debug" index="0" unique_id=1837865503]
 transform = Transform3D(0.425, 0, 0, 0, 0.425, 0, 0, 0, 1.305, 0, 0.09708789, 0)
+visible = false
 mesh = SubResource("PrismMesh_8deia")
 surface_material_override/0 = SubResource("StandardMaterial3D_q1ij5")
 
@@ -131,9 +135,9 @@ side_trigger_dist = 0.45
 step_duration = 0.42
 step_height = 0.4
 max_step_lead_speed = 3.5
+pelvis_height = 2.2
 pelvis_follow_speed = 5.5
 pelvis_support_shift = 0.12
-pelvis_roll_amount = 2.0
 pelvis_pitch_amount = 6.0
 
 [node name="foot_offset_L" type="Marker3D" parent="." index="8" unique_id=417400396]

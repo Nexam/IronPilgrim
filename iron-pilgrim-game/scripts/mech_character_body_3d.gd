@@ -37,6 +37,9 @@ func _physics_process(delta: float) -> void:
 	
 	if Input.is_action_pressed("sprint"):
 		speed_mult = 2.0
+		
+	if input_dir.y > 0:
+		speed_mult *= 0.5
 	
 	velocity.x = direction.x * move_speed * speed_mult
 	velocity.z = direction.z * move_speed * speed_mult

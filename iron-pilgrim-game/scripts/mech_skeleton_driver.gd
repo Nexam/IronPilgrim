@@ -26,7 +26,7 @@ class Leg:
 	var cannon_rotation_correction := Vector3.ZERO
 	var foot_rotation_correction := Vector3.ZERO
 
-
+@export var Draw_Debug:bool = false
 @export_category("Targets")
 @export var pelvis_target: Node3D
 @export var left_foot_target: Node3D
@@ -40,7 +40,9 @@ class Leg:
 @export var torso_bone_name := "torso"
 @export var torso_rotation_correction := Vector3.ZERO
 
-
+@export_category("Cannon and Hinges")
+@export var cannon_preferred_dir_local := Vector3(0.0, 1.0, -0.35)
+@export var knee_pole_dir_local := Vector3.FORWARD
 
 @export_category("Left leg bones")
 @export var left_thigh_bone_name := "thigh.L"
@@ -55,7 +57,7 @@ class Leg:
 @export var right_foot_bone_name := "foot.R"
 
 @export_category("Shared config")
-@export var foot_y_offset := 0.23
+@export var ankle_height := 0.23
 @export var thigh_aim_axis := Vector3.UP
 @export var shin_aim_axis := Vector3.UP
 
@@ -198,6 +200,16 @@ func _create_leg(
 
 	return leg
 
+func _get_knee_pole_dir() -> Vector3:
+	var local_dir := knee_pole_dir_local
+
+	if local_dir.length() < 0.001:
+		local_dir = Vector3.FORWARD
+
+	local_dir = local_dir.normalized()
+
+	var world_dir := global_transform.basis * local_dir
+	return world_dir.normalized()
 
 func _solve_leg(leg: Leg) -> void:
 	if leg == null or leg.foot_target == null:
@@ -209,7 +221,7 @@ func _solve_leg(leg: Leg) -> void:
 	var thigh_pos := _get_bone_global_position(leg.thigh_id)
 	var hock_target := _get_hock_target(leg)
 
-	var pole_dir := -global_transform.basis.z.normalized()
+	var pole_dir := _get_knee_pole_dir()
 
 	var knee_pos := _solve_two_bone_joint_position(
 		thigh_pos,
@@ -233,28 +245,79 @@ func _solve_leg(leg: Leg) -> void:
 		leg.shin_rotation_correction
 	)
 
-	var foot_offset := leg.foot_target.global_transform.basis.y.normalized() * foot_y_offset
-	var foot_bone_target := leg.foot_target.global_position + foot_offset
+	var ankle_pos := _get_ankle_target(leg)
 
 	_look_at_bone_y_axis(
 		leg.cannon_id,
-		foot_bone_target,
+		ankle_pos,
 		leg.cannon_rotation_correction
 	)
 
-	_drive_bone_position(leg.foot_id, leg.foot_target, foot_offset)
+	_drive_bone_position_to_global(leg.foot_id, ankle_pos)
 	_drive_bone_rotation_from_target(
 		leg.foot_id,
 		leg.foot_target,
 		leg.foot_rotation_correction
 	)
 
-
-func _get_hock_target(leg: Leg) -> Vector3:
+func _get_ankle_target(leg: Leg) -> Vector3:
 	var foot_pos := leg.foot_target.global_position
 	var foot_up := leg.foot_target.global_transform.basis.y.normalized()
-	return foot_pos + foot_up * leg.cannon_length
+	return foot_pos + foot_up * ankle_height
 
+func _drive_bone_position_to_global(bone_id: int, target_global_pos: Vector3) -> void:
+	if bone_id == -1:
+		return
+
+	var skeleton := get_skeleton()
+	var skeleton_inv := skeleton.global_transform.affine_inverse()
+
+	var target_pos_skeleton := skeleton_inv * target_global_pos
+
+	var parent_id := skeleton.get_bone_parent(bone_id)
+	var parent_global_pose := Transform3D.IDENTITY
+
+	if parent_id != -1:
+		parent_global_pose = skeleton.get_bone_global_pose(parent_id)
+
+	var current_global_pose := skeleton.get_bone_global_pose(bone_id)
+	current_global_pose.origin = target_pos_skeleton
+
+	var local_pose := parent_global_pose.affine_inverse() * current_global_pose
+	skeleton.set_bone_pose_position(bone_id, local_pose.origin)
+
+func _get_hock_target(leg: Leg) -> Vector3:
+	var ankle_pos := _get_ankle_target(leg)
+	var cannon_dir := _get_preferred_cannon_dir(leg, ankle_pos)
+
+	return ankle_pos + cannon_dir * leg.cannon_length
+
+func _get_preferred_cannon_dir(_leg: Leg, _ankle_pos: Vector3) -> Vector3:
+	var local_dir := cannon_preferred_dir_local
+
+	if local_dir.length() < 0.001:
+		local_dir = Vector3.UP
+
+	local_dir = local_dir.normalized()
+
+	var world_dir := global_transform.basis * local_dir
+	world_dir = world_dir.normalized()
+
+	var pole_dir := _get_knee_pole_dir()
+	var plane_normal := pole_dir.cross(Vector3.UP).normalized()
+
+	if plane_normal.length() > 0.001:
+		world_dir = _project_direction_on_plane(world_dir, plane_normal)
+
+	return world_dir.normalized()
+
+func _project_direction_on_plane(direction: Vector3, plane_normal: Vector3) -> Vector3:
+	var projected := direction - plane_normal * direction.dot(plane_normal)
+
+	if projected.length() < 0.001:
+		return direction.normalized()
+
+	return projected.normalized()
 
 func _drive_pelvis() -> void:
 	var skeleton := get_skeleton()
@@ -527,10 +590,11 @@ func _debug_leg(
 		pole_dir
 	)
 
-	DebugDraw3D.draw_sphere(thigh_pos, 0.08, root_color)
-	DebugDraw3D.draw_sphere(knee_pos, 0.08, knee_color)
-	DebugDraw3D.draw_sphere(hock_target, 0.08, hock_color)
+	if Draw_Debug:
+		DebugDraw3D.draw_sphere(thigh_pos, 0.08, root_color)
+		DebugDraw3D.draw_sphere(knee_pos, 0.08, knee_color)
+		DebugDraw3D.draw_sphere(hock_target, 0.08, hock_color)
 
-	DebugDraw3D.draw_line(thigh_pos, knee_pos, knee_color)
-	DebugDraw3D.draw_line(knee_pos, hock_target, knee_color)
-	DebugDraw3D.draw_line(hock_target, leg.foot_target.global_position, Color.GRAY)
+		DebugDraw3D.draw_line(thigh_pos, knee_pos, knee_color)
+		DebugDraw3D.draw_line(knee_pos, hock_target, knee_color)
+		DebugDraw3D.draw_line(hock_target, leg.foot_target.global_position, Color.GRAY)
