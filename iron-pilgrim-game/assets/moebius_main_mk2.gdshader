@@ -25,7 +25,15 @@ varying float height_gradient;
 varying vec3 local_pos;
 varying vec3 local_normal;
 
+uniform vec4 cavity_color : source_color = vec4(0.18, 0.12, 0.10, 1.0);
+uniform float cavity_strength : hint_range(0.0, 1.0, 0.01) = 0.0;
+uniform float cavity_power : hint_range(0.1, 50.0, 0.1) = 2.0;
+uniform bool invert_cavity = false;
 
+uniform vec4 wear_color : source_color = vec4(1.0, 0.85, 0.55, 1.0);
+uniform float wear_strength : hint_range(0.0, 1.0, 0.01) = 0.0;
+uniform float wear_threshold : hint_range(0.0, 1.0, 0.01) = 0.65;
+uniform float wear_softness : hint_range(0.0, 0.5, 0.01) = 0.1;
 
 void vertex() {
 	local_pos = VERTEX;
@@ -65,6 +73,30 @@ void fragment() {
 	}
 	gradient_color *= mix(1.0, pattern, pattern_strength);
 	
+	float cavity = 1.0-abs(local_normal.y);
+	cavity = clamp(pow(cavity, cavity_power),0.0,1.0);
+	if (invert_cavity){
+		cavity = 1.0-cavity;
+	}
+	gradient_color = mix(
+		gradient_color,
+		cavity_color.rgb,
+		cavity * cavity_strength
+	);
+	
+	float upward = clamp(local_normal.y * 0.5 + 0.5, 0.0, 1.0);
+
+	float wear_mask = smoothstep(
+		wear_threshold,
+		wear_threshold + wear_softness,
+		upward
+	);
+
+	gradient_color = mix(
+		gradient_color,
+		wear_color.rgb,
+		wear_mask * wear_strength
+	);
 
 	ALBEDO = gradient_color;
 

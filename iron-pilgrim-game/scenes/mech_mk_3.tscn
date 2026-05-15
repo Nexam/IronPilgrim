@@ -26,16 +26,18 @@ albedo_color = Color(0.63520473, 0.38205755, 0.98862773, 1)
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_q1ij5"]
 albedo_color = Color(1.1358858e-05, 0.910881, 0.53399074, 1)
 
-[node name="mech-mk2-rigged" unique_id=1638710925 instance=ExtResource("1_ilgpw")]
+[node name="mech-mk2-rigged" unique_id=1638710925 node_paths=PackedStringArray("cockpit_camera", "cockpit_ext_mesh") instance=ExtResource("1_ilgpw")]
 script = ExtResource("2_yl7we")
+cockpit_camera = NodePath("mech_armature/Skeleton3D/BoneAttachment3D/CockpitCamera")
+cockpit_ext_mesh = NodePath("mech_armature/Skeleton3D/Cube_001")
 
-[node name="Cube_001" parent="mech_armature/Skeleton3D" parent_id_path=PackedInt32Array(518136165) index="0" unique_id=1433710403]
+[node name="Cube_001" parent="mech_armature/Skeleton3D" parent_id_path=PackedInt32Array(1477132146) index="0" unique_id=643607896]
 surface_material_override/0 = ExtResource("3_jmupy")
 
-[node name="Cylinder_004" parent="mech_armature/Skeleton3D" parent_id_path=PackedInt32Array(518136165) index="1" unique_id=927026392]
+[node name="Cylinder_004" parent="mech_armature/Skeleton3D" parent_id_path=PackedInt32Array(1477132146) index="1" unique_id=1216737020]
 surface_material_override/0 = ExtResource("3_jmupy")
 
-[node name="MechSkeletonDriver" type="SkeletonModifier3D" parent="mech_armature/Skeleton3D" parent_id_path=PackedInt32Array(518136165) index="2" unique_id=1178697208 node_paths=PackedStringArray("pelvis_target", "left_foot_target", "right_foot_target", "torso_target")]
+[node name="MechSkeletonDriver" type="SkeletonModifier3D" parent="mech_armature/Skeleton3D" parent_id_path=PackedInt32Array(1477132146) index="2" unique_id=1178697208 node_paths=PackedStringArray("pelvis_target", "left_foot_target", "right_foot_target", "torso_target")]
 unique_name_in_owner = false
 process_mode = 0
 process_priority = 0
@@ -63,6 +65,15 @@ left_foot_rotation_correction = Vector3(0, 90, -90)
 right_foot_rotation_correction = Vector3(0, 90, -90)
 pelvis_rotation_correction = Vector3(0, 90, 0)
 metadata/_custom_type_script = "uid://d3eua3fke26sl"
+
+[node name="BoneAttachment3D" type="BoneAttachment3D" parent="mech_armature/Skeleton3D" parent_id_path=PackedInt32Array(1477132146) index="3" unique_id=1631531042]
+transform = Transform3D(3.5762784e-07, 0, 0.9999999, 0, 0.99999994, 0, -0.9999999, 0, 3.5762784e-07, -9.581989e-08, 2.3546157, -0.3371931)
+bone_name = "torso"
+bone_idx = 2
+
+[node name="CockpitCamera" type="Camera3D" parent="mech_armature/Skeleton3D/BoneAttachment3D" index="0" unique_id=341244157]
+transform = Transform3D(-4.3711392e-08, 0, -1.0000001, 0, 1.0000001, 0, 1.0000001, 0, -4.3711392e-08, 0.25957316, 0.781024, -9.283059e-08)
+fov = 90.0
 
 [node name="foot_debug_R" type="Node3D" parent="." index="1" unique_id=222108734]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.7029075, 0, -0.7376461)
@@ -139,6 +150,7 @@ pelvis_height = 2.2
 pelvis_follow_speed = 5.5
 pelvis_support_shift = 0.12
 pelvis_pitch_amount = 6.0
+torso_horizon_stabilization = 0.9
 
 [node name="foot_offset_L" type="Marker3D" parent="." index="8" unique_id=417400396]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.7, 0, -0.7)
