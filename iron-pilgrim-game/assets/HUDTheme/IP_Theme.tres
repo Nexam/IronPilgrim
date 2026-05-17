@@ -1,0 +1,6 @@
+[gd_resource type="Theme" format=3 uid="uid://g8vgchnniuuo"]
+
+[ext_resource type="FontFile" uid="uid://ccn711uqwyxog" path="res://assets/fonts/Instruction.ttf" id="1_3i15i"]
+
+[resource]
+Label/fonts/font = ExtResource("1_3i15i")

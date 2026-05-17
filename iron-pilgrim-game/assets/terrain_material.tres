@@ -1,6 +1,6 @@
 [gd_resource type="ShaderMaterial" format=3 uid="uid://njtmssihg32v"]
 
-[ext_resource type="Shader" uid="uid://b8pgovlnuwcsc" path="res://assets/moebius_main_mk2.gdshader" id="2_shfi3"]
+[ext_resource type="Shader" uid="uid://b8pgovlnuwcsc" path="res://assets/shaders/moebius_main_mk2.gdshader" id="2_shfi3"]
 [ext_resource type="Texture2D" uid="uid://cmedbpxj2a5vv" path="res://assets/dot_pattern_01.png" id="3_ku4tv"]
 
 [resource]

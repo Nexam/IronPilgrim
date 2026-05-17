@@ -39,6 +39,10 @@ class Leg:
 @export_category("Torso")
 @export var torso_bone_name := "torso"
 @export var torso_rotation_correction := Vector3.ZERO
+@export_category("Torso Pitch")
+@export var torso_pitch_min := -35.0
+@export var torso_pitch_max := 45.0
+@export var torso_pitch := 0.0
 
 @export_category("Cannon and Hinges")
 @export var cannon_preferred_dir_local := Vector3(0.0, 1.0, -0.35)
@@ -136,6 +140,19 @@ func _drive_torso() -> void:
 	var skeleton_inv := skeleton.global_transform.affine_inverse()
 
 	var target_basis_skeleton := skeleton_inv.basis * torso_target.global_transform.basis
+	torso_pitch = clampf(
+	torso_pitch,
+	torso_pitch_min,
+	torso_pitch_max
+	)
+
+	var local_pitch := Basis.from_euler(Vector3(
+		deg_to_rad(torso_pitch),
+		0.0,
+		0.0
+	))
+
+	target_basis_skeleton *= local_pitch
 	target_basis_skeleton *= _basis_from_degrees(torso_rotation_correction)
 
 	var parent_id := skeleton.get_bone_parent(torso_bone_id)
