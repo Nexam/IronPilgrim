@@ -10,7 +10,7 @@ config_version=5
 
 [application]
 
-config/name="Iron Pilgrim Game"
+config/name="Iron Pilgrim"
 run/main_scene="uid://bsle8opej6jgn"
 config/features=PackedStringArray("4.6", "Forward Plus")
 config/icon="res://icon.svg"
@@ -18,6 +18,11 @@ config/icon="res://icon.svg"
 [debug_draw_3d]
 
 settings/addon_root_folder="res://addons/debug_draw_3d"
+
+[display]
+
+window/size/viewport_width=1536
+window/size/viewport_height=864
 
 [editor_plugins]
 
