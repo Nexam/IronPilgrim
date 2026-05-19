@@ -5,6 +5,7 @@
 [ext_resource type="Script" uid="uid://dq0mi1tofk4e" path="res://scripts/step_planner.gd" id="3_8deia"]
 [ext_resource type="Script" uid="uid://d3eua3fke26sl" path="res://scripts/mech_skeleton_driver.gd" id="3_bsi3e"]
 [ext_resource type="Material" uid="uid://sl1cmq81r1eo" path="res://assets/mech_material.tres" id="3_jmupy"]
+[ext_resource type="Script" uid="uid://dhan06qs12cal" path="res://scripts/front_scanner.gd" id="3_q1ij5"]
 
 [sub_resource type="PrismMesh" id="PrismMesh_ilgpw"]
 
@@ -26,11 +27,16 @@ albedo_color = Color(0.63520473, 0.38205755, 0.98862773, 1)
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_q1ij5"]
 albedo_color = Color(1.1358858e-05, 0.910881, 0.53399074, 1)
 
-[node name="mech-mk2-rigged" unique_id=1638710925 node_paths=PackedStringArray("cockpit_camera", "cockpit_ext_mesh", "skeleton_driver") instance=ExtResource("1_ilgpw")]
+[node name="mech-mk2-rigged" unique_id=1638710925 node_paths=PackedStringArray("cockpit_camera", "cockpit_ext_mesh", "skeleton_driver", "scan_raycast") instance=ExtResource("1_ilgpw")]
 script = ExtResource("2_yl7we")
 cockpit_camera = NodePath("mech_armature/Skeleton3D/BoneAttachment3D/CockpitCamera")
 cockpit_ext_mesh = NodePath("mech_armature/Skeleton3D/Cube_001")
 skeleton_driver = NodePath("mech_armature/Skeleton3D/MechSkeletonDriver")
+scan_raycast = NodePath("mech_armature/Skeleton3D/BoneAttachment3D/CockpitCamera/ScanRaycast")
+
+[node name="FrontScanner" type="Node" parent="." index="0" unique_id=1039619965 node_paths=PackedStringArray("mech")]
+script = ExtResource("3_q1ij5")
+mech = NodePath("..")
 
 [node name="Cube_001" parent="mech_armature/Skeleton3D" parent_id_path=PackedInt32Array(1477132146) index="0" unique_id=643607896]
 surface_material_override/0 = ExtResource("3_jmupy")
@@ -77,7 +83,11 @@ bone_idx = 2
 transform = Transform3D(-4.3711395e-08, 0, -1.0000001, 0, 1.0000001, 0, 1.0000001, 0, -4.3711395e-08, 0.8020648, 0.78102446, -0.21570092)
 fov = 90.0
 
-[node name="foot_debug_R" type="Node3D" parent="." index="1" unique_id=222108734]
+[node name="ScanRaycast" type="RayCast3D" parent="mech_armature/Skeleton3D/BoneAttachment3D/CockpitCamera" index="0" unique_id=1806093188]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.937151e-07, 0, -0.5108901)
+target_position = Vector3(0, 0, -10)
+
+[node name="foot_debug_R" type="Node3D" parent="." index="2" unique_id=222108734]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.7029075, 0, -0.7376461)
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="foot_debug_R" index="0" unique_id=1742517944]
@@ -86,7 +96,7 @@ visible = false
 mesh = SubResource("PrismMesh_ilgpw")
 surface_material_override/0 = SubResource("StandardMaterial3D_yl7we")
 
-[node name="foot_debug_L" type="Node3D" parent="." index="2" unique_id=580783982]
+[node name="foot_debug_L" type="Node3D" parent="." index="3" unique_id=580783982]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.7049554, 0, -0.7376461)
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="foot_debug_L" index="0" unique_id=607626051]
@@ -95,7 +105,7 @@ visible = false
 mesh = SubResource("PrismMesh_ilgpw")
 surface_material_override/0 = SubResource("StandardMaterial3D_8deia")
 
-[node name="torso_debug" type="Node3D" parent="." index="3" unique_id=1066884524]
+[node name="torso_debug" type="Node3D" parent="." index="4" unique_id=1066884524]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.068211, -0.34184992)
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="torso_debug" index="0" unique_id=1133217079]
@@ -115,7 +125,7 @@ visible = false
 mesh = SubResource("PrismMesh_bsi3e")
 surface_material_override/0 = SubResource("StandardMaterial3D_lqbcs")
 
-[node name="Pelvis Debug" type="Node3D" parent="." index="4" unique_id=355073640]
+[node name="Pelvis Debug" type="Node3D" parent="." index="5" unique_id=355073640]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.82, -0.34184992)
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Pelvis Debug" index="0" unique_id=1837865503]
@@ -124,15 +134,15 @@ visible = false
 mesh = SubResource("PrismMesh_8deia")
 surface_material_override/0 = SubResource("StandardMaterial3D_q1ij5")
 
-[node name="raycast_foot_L" type="RayCast3D" parent="." index="5" unique_id=1071141514]
+[node name="raycast_foot_L" type="RayCast3D" parent="." index="6" unique_id=1071141514]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.7, 0, -0.7)
 target_position = Vector3(0, -6, 0)
 
-[node name="raycast_foot_R" type="RayCast3D" parent="." index="6" unique_id=1032491182]
+[node name="raycast_foot_R" type="RayCast3D" parent="." index="7" unique_id=1032491182]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.7, 0, -0.7)
 target_position = Vector3(0, -6, 0)
 
-[node name="StepsPlanner" type="Node3D" parent="." index="7" unique_id=867662409 node_paths=PackedStringArray("left_debug", "left_raycast", "left_offset", "right_debug", "right_raycast", "right_offset", "pelvis_debug", "torso_debug")]
+[node name="StepsPlanner" type="Node3D" parent="." index="8" unique_id=867662409 node_paths=PackedStringArray("left_debug", "left_raycast", "left_offset", "right_debug", "right_raycast", "right_offset", "pelvis_debug", "torso_debug")]
 script = ExtResource("3_8deia")
 left_debug = NodePath("../foot_debug_L")
 left_raycast = NodePath("../raycast_foot_L")
@@ -154,8 +164,8 @@ pelvis_support_shift = 0.12
 pelvis_pitch_amount = 6.0
 torso_horizon_stabilization = 0.9
 
-[node name="foot_offset_L" type="Marker3D" parent="." index="8" unique_id=417400396]
+[node name="foot_offset_L" type="Marker3D" parent="." index="9" unique_id=417400396]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.7, 0, -0.7)
 
-[node name="foot_offset_R" type="Marker3D" parent="." index="9" unique_id=686586530]
+[node name="foot_offset_R" type="Marker3D" parent="." index="10" unique_id=686586530]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.7, 0, -0.7)

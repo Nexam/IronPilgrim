@@ -47,8 +47,9 @@ func _physics_process(delta: float) -> void:
 		velocity.y -= gravity * delta
 		
 	var input_view := Input.get_vector("view_right", "view_left", "view_up", "view_down")
-	var view_dir := (transform.basis * Vector3(0, input_view.x,0)).normalized()
-	rotate(view_dir, delta)
+	if abs(input_view.x) > 0.0:
+		var view_dir := (transform.basis * Vector3(0, input_view.x,0)).normalized()
+		rotate(view_dir, delta)
 	
 	mech.skeleton_driver.torso_pitch -= input_view.y
 

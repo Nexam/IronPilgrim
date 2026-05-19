@@ -28,6 +28,10 @@ window/size/viewport_height=864
 
 enabled=PackedStringArray()
 
+[global_group]
+
+scannable=""
+
 [input]
 
 move_forward={

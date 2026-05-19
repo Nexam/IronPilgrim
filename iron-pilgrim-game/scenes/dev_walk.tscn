@@ -9,6 +9,7 @@
 [ext_resource type="Theme" uid="uid://g8vgchnniuuo" path="res://assets/HUDTheme/IP_Theme.tres" id="8_5s85h"]
 [ext_resource type="Script" uid="uid://bhthil6c0hlc2" path="res://scripts/HUD/hud_compas.gd" id="8_j5jqi"]
 [ext_resource type="Shader" uid="uid://cvlx4w72k5rvn" path="res://assets/shaders/VHS_Effect.gdshader" id="9_qks15"]
+[ext_resource type="Script" uid="uid://b2vxwi00infrj" path="res://scripts/HUD/hud_general_infos.gd" id="10_4a2gc"]
 [ext_resource type="Shader" uid="uid://c5fpebaakokr0" path="res://assets/shaders/water.gdshader" id="10_x8xrh"]
 [ext_resource type="Script" uid="uid://ds58h3op3nt31" path="res://scripts/HUD/hud_frame_corners.gd" id="11_yg5qh"]
 [ext_resource type="Script" uid="uid://bk0onibnrxl4x" path="res://scripts/mech_character_body_3d.gd" id="dev_walk_gd"]
@@ -227,7 +228,7 @@ fov = 90.0
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.602314, 0)
 shape = SubResource("SphereShape3D_06liw")
 
-[node name="obstacle" type="StaticBody3D" parent="." unique_id=251984102]
+[node name="obstacle" type="StaticBody3D" parent="." unique_id=251984102 groups=["scannable"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.8055332, 0.5274, -7.920167)
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="obstacle" unique_id=196647436]
@@ -237,7 +238,7 @@ surface_material_override/0 = ExtResource("2_m2kco")
 [node name="CollisionShape3D" type="CollisionShape3D" parent="obstacle" unique_id=374921680]
 shape = SubResource("BoxShape3D_aqt6j")
 
-[node name="ramp01" type="StaticBody3D" parent="." unique_id=1293270225]
+[node name="ramp01" type="StaticBody3D" parent="." unique_id=1293270225 groups=["scannable"]]
 transform = Transform3D(4, 0, 0, 0, 3.8222265, -1.1792302, 0, 1.1792302, 3.8222265, -9.530947, -0.5598836, -7.920167)
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="ramp01" unique_id=94156009]
@@ -247,7 +248,7 @@ surface_material_override/0 = ExtResource("2_m2kco")
 [node name="CollisionShape3D" type="CollisionShape3D" parent="ramp01" unique_id=771122724]
 shape = SubResource("BoxShape3D_aqt6j")
 
-[node name="random02" type="StaticBody3D" parent="." unique_id=471682944]
+[node name="random02" type="StaticBody3D" parent="." unique_id=471682944 groups=["scannable"]]
 transform = Transform3D(4, 0, 0, 0, 3.8222265, -1.1792302, 0, 1.1792302, 3.8222265, -9.530947, 0.59364367, -11.689988)
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="random02" unique_id=398295609]
@@ -356,6 +357,7 @@ size_flags_vertical = 0
 text = "SYS_VER: 198.3c
 UNIT_ID: IP-69_NX
 WEIGHT: 18.2Ton"
+script = ExtResource("10_4a2gc")
 
 [node name="Label_Console" type="Label" parent="CanvasLayer/Cockpit HUD/MarginContainer2/Panel/MarginContainer" unique_id=1333727323]
 layout_mode = 2
