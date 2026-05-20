@@ -175,6 +175,9 @@ shader_parameter/traced_ssr_far_clip = 50.0
 shader_parameter/traced_ssr_steps = 512
 shader_parameter/ssr_screen_fade = 0.05
 
+[sub_resource type="BoxShape3D" id="BoxShape3D_4a2gc"]
+size = Vector3(2.7441406, 4.1749268, 3.3048096)
+
 [node name="Node3D" type="Node3D" unique_id=192769499]
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1668621935]
@@ -220,9 +223,9 @@ ext_camera = NodePath("Camera3D")
 gizmo_extents = 0.6
 
 [node name="Camera3D" type="Camera3D" parent="CharacterBody3D" unique_id=1332700593]
-transform = Transform3D(1, 0, 0, 0, 0.9941585, -0.10792995, 0, 0.10792995, 0.9941585, -3.164434, 3.7196066, 3.842075)
+transform = Transform3D(1, 0, 0, 0, 0.9999745, 0.007138334, 0, -0.007138334, 0.9999745, -2.9035373, 3.0725572, 4.024029)
 current = true
-fov = 90.0
+fov = 85.0
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="CharacterBody3D" unique_id=972848160]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.602314, 0)
@@ -241,6 +244,15 @@ shape = SubResource("BoxShape3D_aqt6j")
 [node name="ramp01" type="StaticBody3D" parent="." unique_id=1293270225 groups=["scannable"]]
 transform = Transform3D(4, 0, 0, 0, 3.8222265, -1.1792302, 0, 1.1792302, 3.8222265, -9.530947, -0.5598836, -7.920167)
 
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="ramp01" unique_id=398295609]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.002277732, -0.9855865)
+mesh = SubResource("BoxMesh_j671i")
+surface_material_override/0 = ExtResource("2_m2kco")
+
+[node name="CollisionShape3D2" type="CollisionShape3D" parent="ramp01" unique_id=42543191]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.002277732, -0.9855865)
+shape = SubResource("BoxShape3D_aqt6j")
+
 [node name="MeshInstance3D" type="MeshInstance3D" parent="ramp01" unique_id=94156009]
 mesh = SubResource("BoxMesh_j671i")
 surface_material_override/0 = ExtResource("2_m2kco")
@@ -248,12 +260,8 @@ surface_material_override/0 = ExtResource("2_m2kco")
 [node name="CollisionShape3D" type="CollisionShape3D" parent="ramp01" unique_id=771122724]
 shape = SubResource("BoxShape3D_aqt6j")
 
-[node name="random02" type="StaticBody3D" parent="." unique_id=471682944 groups=["scannable"]]
+[node name="random02" type="Node3D" parent="." unique_id=440921882]
 transform = Transform3D(4, 0, 0, 0, 3.8222265, -1.1792302, 0, 1.1792302, 3.8222265, -9.530947, 0.59364367, -11.689988)
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="random02" unique_id=398295609]
-mesh = SubResource("BoxMesh_j671i")
-surface_material_override/0 = ExtResource("2_m2kco")
 
 [node name="MeshInstance3D2" type="MeshInstance3D" parent="random02" unique_id=26799980]
 transform = Transform3D(1, 0, 0, 0, 6.95269, 0, 0, 0, 0.23065092, -7.9291244, 0.82282495, -8.4299965)
@@ -264,18 +272,6 @@ surface_material_override/0 = ExtResource("2_m2kco")
 transform = Transform3D(2.93596, 0, 0, 0, 6.9526873, 2.2351742e-08, 0, 0, 0.23065086, -4.385863, 4.752532, 4.307331)
 mesh = SubResource("BoxMesh_j671i")
 surface_material_override/0 = ExtResource("2_m2kco")
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="random02" unique_id=42543191]
-shape = SubResource("BoxShape3D_aqt6j")
-
-[node name="mech-mockup" type="MeshInstance3D" parent="." unique_id=1622777061]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.0968776, 0.98174745, -17.623678)
-mesh = ExtResource("3_pvwu3")
-surface_material_override/0 = ExtResource("5_06liw")
-surface_material_override/1 = ExtResource("5_06liw")
-surface_material_override/2 = ExtResource("5_06liw")
-surface_material_override/3 = ExtResource("5_06liw")
-surface_material_override/4 = ExtResource("5_06liw")
 
 [node name="terrain-test" type="StaticBody3D" parent="." unique_id=436042344]
 
@@ -436,3 +432,18 @@ transform = Transform3D(14.71, 0, 0, 0, -6.429945e-07, 14.71, 0, -14.71, -6.4299
 visible = false
 mesh = SubResource("QuadMesh_5s85h")
 surface_material_override/0 = SubResource("ShaderMaterial_yg5qh")
+
+[node name="StaticBody3D2" type="StaticBody3D" parent="." unique_id=477868034 groups=["scannable"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.5434275, 0.93175125, -17.104654)
+
+[node name="mech-mockup" type="MeshInstance3D" parent="StaticBody3D2" unique_id=1622777061]
+mesh = ExtResource("3_pvwu3")
+surface_material_override/0 = ExtResource("5_06liw")
+surface_material_override/1 = ExtResource("5_06liw")
+surface_material_override/2 = ExtResource("5_06liw")
+surface_material_override/3 = ExtResource("5_06liw")
+surface_material_override/4 = ExtResource("5_06liw")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D2" unique_id=2099355465]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5874634, 0.8088131)
+shape = SubResource("BoxShape3D_4a2gc")

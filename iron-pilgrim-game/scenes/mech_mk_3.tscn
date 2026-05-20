@@ -38,13 +38,13 @@ scan_raycast = NodePath("mech_armature/Skeleton3D/BoneAttachment3D/CockpitCamera
 script = ExtResource("3_q1ij5")
 mech = NodePath("..")
 
-[node name="Cube_001" parent="mech_armature/Skeleton3D" parent_id_path=PackedInt32Array(1477132146) index="0" unique_id=643607896]
+[node name="Cube_001" parent="mech_armature/Skeleton3D" parent_id_path=PackedInt32Array(1179631831) index="0" unique_id=1634670494]
 surface_material_override/0 = ExtResource("3_jmupy")
 
-[node name="Cylinder_004" parent="mech_armature/Skeleton3D" parent_id_path=PackedInt32Array(1477132146) index="1" unique_id=1216737020]
+[node name="Cylinder_004" parent="mech_armature/Skeleton3D" parent_id_path=PackedInt32Array(1179631831) index="1" unique_id=80330862]
 surface_material_override/0 = ExtResource("3_jmupy")
 
-[node name="MechSkeletonDriver" type="SkeletonModifier3D" parent="mech_armature/Skeleton3D" parent_id_path=PackedInt32Array(1477132146) index="2" unique_id=1178697208 node_paths=PackedStringArray("pelvis_target", "left_foot_target", "right_foot_target", "torso_target")]
+[node name="MechSkeletonDriver" type="SkeletonModifier3D" parent="mech_armature/Skeleton3D" parent_id_path=PackedInt32Array(1179631831) index="2" unique_id=1178697208 node_paths=PackedStringArray("pelvis_target", "left_foot_target", "right_foot_target", "torso_target")]
 unique_name_in_owner = false
 process_mode = 0
 process_priority = 0
@@ -74,7 +74,7 @@ right_foot_rotation_correction = Vector3(0, 90, -90)
 pelvis_rotation_correction = Vector3(0, 90, 0)
 metadata/_custom_type_script = "uid://d3eua3fke26sl"
 
-[node name="BoneAttachment3D" type="BoneAttachment3D" parent="mech_armature/Skeleton3D" parent_id_path=PackedInt32Array(1477132146) index="3" unique_id=1631531042]
+[node name="BoneAttachment3D" type="BoneAttachment3D" parent="mech_armature/Skeleton3D" parent_id_path=PackedInt32Array(1179631831) index="3" unique_id=1631531042]
 transform = Transform3D(3.5762784e-07, 0, 0.9999999, 0, 0.99999994, 0, -0.9999999, 0, 3.5762784e-07, -9.581989e-08, 2.3546157, -0.3371931)
 bone_name = "torso"
 bone_idx = 2
