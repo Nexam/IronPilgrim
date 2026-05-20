@@ -12,6 +12,7 @@
 [ext_resource type="Script" uid="uid://b2vxwi00infrj" path="res://scripts/HUD/hud_general_infos.gd" id="10_4a2gc"]
 [ext_resource type="Shader" uid="uid://c5fpebaakokr0" path="res://assets/shaders/water.gdshader" id="10_x8xrh"]
 [ext_resource type="Script" uid="uid://ds58h3op3nt31" path="res://scripts/HUD/hud_frame_corners.gd" id="11_yg5qh"]
+[ext_resource type="Script" uid="uid://dvfwaik57f2t8" path="res://scripts/HUD/hud_terminal_panel.gd" id="13_5lmna"]
 [ext_resource type="Script" uid="uid://bk0onibnrxl4x" path="res://scripts/mech_character_body_3d.gd" id="dev_walk_gd"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_06liw"]
@@ -148,6 +149,8 @@ corner_radius_bottom_left = 10
 line_spacing = 1.0
 font_size = 12
 font_color = Color(0, 0, 0, 1)
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_5lmna"]
 
 [sub_resource type="QuadMesh" id="QuadMesh_5s85h"]
 
@@ -329,57 +332,10 @@ theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 10
 
 [node name="Panel" type="Panel" parent="CanvasLayer/Cockpit HUD/MarginContainer2" unique_id=1502245099]
+visible = false
 layout_mode = 2
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_vild0")
-
-[node name="MarginContainer" type="MarginContainer" parent="CanvasLayer/Cockpit HUD/MarginContainer2/Panel" unique_id=1779957205]
-custom_minimum_size = Vector2(300, 400)
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_constants/margin_left = 10
-theme_override_constants/margin_top = 10
-theme_override_constants/margin_right = 10
-theme_override_constants/margin_bottom = 10
-
-[node name="Label_MachineID" type="Label" parent="CanvasLayer/Cockpit HUD/MarginContainer2/Panel/MarginContainer" unique_id=578337770]
-layout_mode = 2
-size_flags_horizontal = 0
-size_flags_vertical = 0
-text = "SYS_VER: 198.3c
-UNIT_ID: IP-69_NX
-WEIGHT: 18.2Ton"
-script = ExtResource("10_4a2gc")
-
-[node name="Label_Console" type="Label" parent="CanvasLayer/Cockpit HUD/MarginContainer2/Panel/MarginContainer" unique_id=1333727323]
-layout_mode = 2
-text = "## Boot loading sequence...
-Loading mission...
-
-PROTECT PAYLOAD"
-label_settings = SubResource("LabelSettings_5s85h")
-
-[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/Cockpit HUD/MarginContainer2/Panel/MarginContainer" unique_id=904115994]
-layout_mode = 2
-size_flags_horizontal = 8
-size_flags_vertical = 4
-
-[node name="PanelContainer" type="PanelContainer" parent="CanvasLayer/Cockpit HUD/MarginContainer2/Panel/MarginContainer/VBoxContainer" unique_id=362068093]
-layout_mode = 2
-theme = ExtResource("8_5s85h")
-theme_type_variation = &"PanelContainer_ERROR"
-
-[node name="MarginContainer" type="MarginContainer" parent="CanvasLayer/Cockpit HUD/MarginContainer2/Panel/MarginContainer/VBoxContainer/PanelContainer" unique_id=424500888]
-layout_mode = 2
-
-[node name="Label" type="Label" parent="CanvasLayer/Cockpit HUD/MarginContainer2/Panel/MarginContainer/VBoxContainer/PanelContainer/MarginContainer" unique_id=298351332]
-layout_mode = 2
-theme_type_variation = &"Label_ERROR"
-text = "LEGS DAMAGED:29% EOC"
 
 [node name="HSlider" type="HSlider" parent="CanvasLayer/Cockpit HUD/MarginContainer2/Panel" unique_id=354273046 node_paths=PackedStringArray("to_track")]
 visible = false
@@ -391,6 +347,40 @@ grow_horizontal = 2
 max_value = 180.0
 script = ExtResource("8_j5jqi")
 to_track = NodePath("../../../../../CharacterBody3D")
+
+[node name="MarginContainer" type="MarginContainer" parent="CanvasLayer/Cockpit HUD/MarginContainer2" unique_id=1779957205]
+custom_minimum_size = Vector2(300, 400)
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="Label_Console" type="Label" parent="CanvasLayer/Cockpit HUD/MarginContainer2/MarginContainer" unique_id=1333727323]
+layout_mode = 2
+text = "## Boot loading sequence...
+Loading mission...
+
+PROTECT PAYLOAD"
+label_settings = SubResource("LabelSettings_5s85h")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/Cockpit HUD/MarginContainer2/MarginContainer" unique_id=904115994]
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 4
+
+[node name="PanelContainer" type="PanelContainer" parent="CanvasLayer/Cockpit HUD/MarginContainer2/MarginContainer/VBoxContainer" unique_id=362068093]
+layout_mode = 2
+theme = ExtResource("8_5s85h")
+theme_type_variation = &"PanelContainer_ERROR"
+
+[node name="MarginContainer" type="MarginContainer" parent="CanvasLayer/Cockpit HUD/MarginContainer2/MarginContainer/VBoxContainer/PanelContainer" unique_id=424500888]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="CanvasLayer/Cockpit HUD/MarginContainer2/MarginContainer/VBoxContainer/PanelContainer/MarginContainer" unique_id=298351332]
+layout_mode = 2
+theme_type_variation = &"Label_ERROR"
+text = "LEGS DAMAGED:29% EOC"
 
 [node name="Control" type="Control" parent="CanvasLayer/Cockpit HUD" unique_id=243085568]
 layout_mode = 1
@@ -426,6 +416,74 @@ grow_horizontal = 2
 grow_vertical = 0
 value = 12.65
 show_percentage = false
+
+[node name="MarginContainer" type="MarginContainer" parent="CanvasLayer/Cockpit HUD" unique_id=1624654205]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TopLeftBox" type="VBoxContainer" parent="CanvasLayer/Cockpit HUD/MarginContainer" unique_id=2095716410]
+custom_minimum_size = Vector2(200, 300)
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+
+[node name="TerminalPanel" type="PanelContainer" parent="CanvasLayer/Cockpit HUD/MarginContainer/TopLeftBox" unique_id=1938381965]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxEmpty_5lmna")
+script = ExtResource("13_5lmna")
+LINE_COLOR = Color(0.52813727, 0.48366922, 0.28883448, 1)
+
+[node name="MarginContainer" type="MarginContainer" parent="CanvasLayer/Cockpit HUD/MarginContainer/TopLeftBox/TerminalPanel" unique_id=1399366763]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/Cockpit HUD/MarginContainer/TopLeftBox/TerminalPanel/MarginContainer" unique_id=796602891]
+layout_mode = 2
+
+[node name="Label_MachineID" type="Label" parent="CanvasLayer/Cockpit HUD/MarginContainer/TopLeftBox/TerminalPanel/MarginContainer/VBoxContainer" unique_id=578337770]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+text = "FPS: 498"
+script = ExtResource("10_4a2gc")
+
+[node name="Label_MachineID2" type="Label" parent="CanvasLayer/Cockpit HUD/MarginContainer/TopLeftBox/TerminalPanel/MarginContainer/VBoxContainer" unique_id=1571226170]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+text = "SYS_VER: 198.3c
+UNIT_ID: IP-69_NX
+WEIGHT: 18.2Ton"
+
+[node name="TopRightBox" type="VBoxContainer" parent="CanvasLayer/Cockpit HUD/MarginContainer" unique_id=234358978]
+custom_minimum_size = Vector2(200, 300)
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 0
+
+[node name="TerminalPanel" type="PanelContainer" parent="CanvasLayer/Cockpit HUD/MarginContainer/TopRightBox" unique_id=1133876823]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxEmpty_5lmna")
+script = ExtResource("13_5lmna")
+LINE_COLOR = Color(0.52813727, 0.48366922, 0.28883448, 1)
+title = "NAV.SIG"
+
+[node name="MarginContainer" type="MarginContainer" parent="CanvasLayer/Cockpit HUD/MarginContainer/TopRightBox/TerminalPanel" unique_id=1666980064]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/Cockpit HUD/MarginContainer/TopRightBox/TerminalPanel/MarginContainer" unique_id=406234018]
+layout_mode = 2
+
+[node name="Label_MachineID2" type="Label" parent="CanvasLayer/Cockpit HUD/MarginContainer/TopRightBox/TerminalPanel/MarginContainer/VBoxContainer" unique_id=1392927863]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+text = "DIRECTION: 16d
+STR:  ||||....
+PRIORITY: HIGH"
 
 [node name="Water Test" type="MeshInstance3D" parent="." unique_id=480692667]
 transform = Transform3D(14.71, 0, 0, 0, -6.429945e-07, 14.71, 0, -14.71, -6.429945e-07, -18.155548, 0.120034456, -14.99268)
