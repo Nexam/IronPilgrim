@@ -7,7 +7,6 @@
 [ext_resource type="Material" uid="uid://sl1cmq81r1eo" path="res://assets/mech_material.tres" id="5_06liw"]
 [ext_resource type="Shader" uid="uid://bduy8cens3fxi" path="res://assets/shaders/screen_effects.gdshader" id="6_m2kco"]
 [ext_resource type="Theme" uid="uid://g8vgchnniuuo" path="res://assets/HUDTheme/IP_Theme.tres" id="8_5s85h"]
-[ext_resource type="Script" uid="uid://bhthil6c0hlc2" path="res://scripts/HUD/hud_compas.gd" id="8_j5jqi"]
 [ext_resource type="Shader" uid="uid://cvlx4w72k5rvn" path="res://assets/shaders/VHS_Effect.gdshader" id="9_qks15"]
 [ext_resource type="Script" uid="uid://b2vxwi00infrj" path="res://scripts/HUD/hud_general_infos.gd" id="10_4a2gc"]
 [ext_resource type="Shader" uid="uid://c5fpebaakokr0" path="res://assets/shaders/water.gdshader" id="10_x8xrh"]
@@ -128,29 +127,17 @@ shader_parameter/vignette_intensity = 0.150000007125
 [sub_resource type="ViewportTexture" id="ViewportTexture_j7i7u"]
 viewport_path = NodePath("SubViewport")
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_vild0"]
-content_margin_left = 20.0
-content_margin_top = 20.0
-content_margin_right = 20.0
-content_margin_bottom = 20.0
-bg_color = Color(0.58396953, 0.3363599, 9.62615e-08, 1)
-draw_center = false
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 3
-border_color = Color(0, 0, 0, 1)
-corner_radius_top_left = 10
-corner_radius_top_right = 10
-corner_radius_bottom_right = 10
-corner_radius_bottom_left = 10
-
-[sub_resource type="LabelSettings" id="LabelSettings_5s85h"]
-line_spacing = 1.0
-font_size = 12
-font_color = Color(0, 0, 0, 1)
-
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_5lmna"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_4a2gc"]
+font_size = 14
+font_color = Color(1, 0, 0, 1)
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_ylfus"]
+content_margin_left = 8.0
+content_margin_top = 12.0
+content_margin_right = 8.0
+content_margin_bottom = 8.0
 
 [sub_resource type="QuadMesh" id="QuadMesh_5s85h"]
 
@@ -319,89 +306,28 @@ grow_vertical = 2
 mouse_filter = 1
 theme = ExtResource("8_5s85h")
 
-[node name="MarginContainer2" type="MarginContainer" parent="CanvasLayer/Cockpit HUD" unique_id=1678334219]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_constants/margin_left = 10
-theme_override_constants/margin_top = 10
-theme_override_constants/margin_right = 10
-theme_override_constants/margin_bottom = 10
-
-[node name="Panel" type="Panel" parent="CanvasLayer/Cockpit HUD/MarginContainer2" unique_id=1502245099]
-visible = false
-layout_mode = 2
-mouse_filter = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_vild0")
-
-[node name="HSlider" type="HSlider" parent="CanvasLayer/Cockpit HUD/MarginContainer2/Panel" unique_id=354273046 node_paths=PackedStringArray("to_track")]
-visible = false
-layout_mode = 1
-anchors_preset = 10
-anchor_right = 1.0
-offset_bottom = 16.0
-grow_horizontal = 2
-max_value = 180.0
-script = ExtResource("8_j5jqi")
-to_track = NodePath("../../../../../CharacterBody3D")
-
-[node name="MarginContainer" type="MarginContainer" parent="CanvasLayer/Cockpit HUD/MarginContainer2" unique_id=1779957205]
-custom_minimum_size = Vector2(300, 400)
-layout_mode = 2
-theme_override_constants/margin_left = 10
-theme_override_constants/margin_top = 10
-theme_override_constants/margin_right = 10
-theme_override_constants/margin_bottom = 10
-
-[node name="Label_Console" type="Label" parent="CanvasLayer/Cockpit HUD/MarginContainer2/MarginContainer" unique_id=1333727323]
-layout_mode = 2
-text = "## Boot loading sequence...
-Loading mission...
-
-PROTECT PAYLOAD"
-label_settings = SubResource("LabelSettings_5s85h")
-
-[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/Cockpit HUD/MarginContainer2/MarginContainer" unique_id=904115994]
-layout_mode = 2
-size_flags_horizontal = 8
-size_flags_vertical = 4
-
-[node name="PanelContainer" type="PanelContainer" parent="CanvasLayer/Cockpit HUD/MarginContainer2/MarginContainer/VBoxContainer" unique_id=362068093]
-layout_mode = 2
-theme = ExtResource("8_5s85h")
-theme_type_variation = &"PanelContainer_ERROR"
-
-[node name="MarginContainer" type="MarginContainer" parent="CanvasLayer/Cockpit HUD/MarginContainer2/MarginContainer/VBoxContainer/PanelContainer" unique_id=424500888]
-layout_mode = 2
-
-[node name="Label" type="Label" parent="CanvasLayer/Cockpit HUD/MarginContainer2/MarginContainer/VBoxContainer/PanelContainer/MarginContainer" unique_id=298351332]
-layout_mode = 2
-theme_type_variation = &"Label_ERROR"
-text = "LEGS DAMAGED:29% EOC"
-
 [node name="Control" type="Control" parent="CanvasLayer/Cockpit HUD" unique_id=243085568]
+custom_minimum_size = Vector2(32, 32)
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -37.0
-offset_top = -37.0
-offset_right = 37.0
-offset_bottom = 37.0
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 12.0
+offset_bottom = 12.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("11_yg5qh")
-corner_radius = 4.0
-corner_lenght = 16.0
+corner_res = 3
+corner_lenght = 8.0
 line_color = Color(1, 1, 1, 0.32941177)
 line_width = 1.0
 
-[node name="ProgressBar" type="ProgressBar" parent="CanvasLayer/Cockpit HUD/Control" unique_id=1177870547]
+[node name="Scan progress bar" type="ProgressBar" parent="CanvasLayer/Cockpit HUD/Control" unique_id=1177870547]
+visible = false
 layout_mode = 1
 anchors_preset = 7
 anchor_left = 0.5
@@ -484,6 +410,42 @@ size_flags_vertical = 0
 text = "DIRECTION: 16d
 STR:  ||||....
 PRIORITY: HIGH"
+
+[node name="TerminalPanel2" type="PanelContainer" parent="CanvasLayer/Cockpit HUD/MarginContainer/TopRightBox" unique_id=1062574053]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxEmpty_5lmna")
+script = ExtResource("13_5lmna")
+LINE_COLOR = Color(0.9, 0, 0, 1)
+title = "MESH.STATUS"
+
+[node name="MarginContainer" type="MarginContainer" parent="CanvasLayer/Cockpit HUD/MarginContainer/TopRightBox/TerminalPanel2" unique_id=500408900]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/Cockpit HUD/MarginContainer/TopRightBox/TerminalPanel2/MarginContainer" unique_id=743054393]
+layout_mode = 2
+
+[node name="Label_MachineID2" type="Label" parent="CanvasLayer/Cockpit HUD/MarginContainer/TopRightBox/TerminalPanel2/MarginContainer/VBoxContainer" unique_id=758776567]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+text = "R.LEG: CrITICAL"
+label_settings = SubResource("LabelSettings_4a2gc")
+
+[node name="BottomLeftConsole" type="PanelContainer" parent="CanvasLayer/Cockpit HUD/MarginContainer" unique_id=2055699495]
+custom_minimum_size = Vector2(350, 220)
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 8
+theme_override_styles/panel = SubResource("StyleBoxEmpty_ylfus")
+script = ExtResource("13_5lmna")
+LINE_COLOR = Color(0.5294118, 0.48235294, 0.2901961, 1)
+title = "SYS.CONSOLE"
+
+[node name="Label_MachineID2" type="Label" parent="CanvasLayer/Cockpit HUD/MarginContainer/BottomLeftConsole" unique_id=1157561283]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+text = "> Scanning..."
 
 [node name="Water Test" type="MeshInstance3D" parent="." unique_id=480692667]
 transform = Transform3D(14.71, 0, 0, 0, -6.429945e-07, 14.71, 0, -14.71, -6.429945e-07, -18.155548, 0.120034456, -14.99268)

@@ -47,3 +47,4 @@ ProgressBar/constants/outline_size = 7
 ProgressBar/fonts/font = ExtResource("2_x6ffa")
 ProgressBar/styles/background = SubResource("StyleBoxFlat_w4uvk")
 ProgressBar/styles/fill = SubResource("StyleBoxFlat_0tgbb")
+VBoxContainer/constants/separation = 14
