@@ -1,6 +1,6 @@
 @tool
 class_name TerminalPanel
-extends Control
+extends PanelContainer
 
 @export var LINE_COLOR := Color(1.0, 1.0, 1.0, 1.0)
 @export var BACKGROUND_COLOR := Color(0.06, 0.029, 0.025, 0.604)
@@ -65,8 +65,8 @@ func _draw_header(rect: Rect2) -> void:
 		var font_size := get_theme_default_font_size()*0.8
 		var text := str("%s" % title)
 		var text_size := font.get_string_size( text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size )
-
-		draw_rect(Rect2( title_offset-title_padding,y0- text_size.y/4.0-title_padding ,text_size.x+title_padding*3.0, text_size.y/2.0),BACKGROUND_COLOR,true)
+		if draw_fill:
+			draw_rect(Rect2( title_offset-title_padding,y0- text_size.y/4.0-title_padding ,text_size.x+title_padding*3.0, text_size.y/2.0),BACKGROUND_COLOR,true)
 		draw_line(Vector2(x0,y0), Vector2(x0+title_offset - title_padding,y0), LINE_COLOR, line_width, aa)
 		draw_string( font, Vector2(x0+title_offset+title_padding, y0+text_size.y/4.0), text, HORIZONTAL_ALIGNMENT_LEFT,
 			-1, font_size, LINE_COLOR )

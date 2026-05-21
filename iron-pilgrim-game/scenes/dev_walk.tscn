@@ -362,6 +362,7 @@ layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxEmpty_5lmna")
 script = ExtResource("13_5lmna")
 LINE_COLOR = Color(0.52813727, 0.48366922, 0.28883448, 1)
+draw_fill = false
 
 [node name="MarginContainer" type="MarginContainer" parent="CanvasLayer/Cockpit HUD/MarginContainer/TopLeftBox/TerminalPanel" unique_id=1399366763]
 layout_mode = 2
@@ -396,6 +397,7 @@ theme_override_styles/panel = SubResource("StyleBoxEmpty_5lmna")
 script = ExtResource("13_5lmna")
 LINE_COLOR = Color(0.52813727, 0.48366922, 0.28883448, 1)
 title = "NAV.SIG"
+draw_fill = false
 
 [node name="MarginContainer" type="MarginContainer" parent="CanvasLayer/Cockpit HUD/MarginContainer/TopRightBox/TerminalPanel" unique_id=1666980064]
 layout_mode = 2
@@ -417,6 +419,7 @@ theme_override_styles/panel = SubResource("StyleBoxEmpty_5lmna")
 script = ExtResource("13_5lmna")
 LINE_COLOR = Color(0.9, 0, 0, 1)
 title = "MESH.STATUS"
+draw_fill = false
 
 [node name="MarginContainer" type="MarginContainer" parent="CanvasLayer/Cockpit HUD/MarginContainer/TopRightBox/TerminalPanel2" unique_id=500408900]
 layout_mode = 2
@@ -440,12 +443,31 @@ theme_override_styles/panel = SubResource("StyleBoxEmpty_ylfus")
 script = ExtResource("13_5lmna")
 LINE_COLOR = Color(0.5294118, 0.48235294, 0.2901961, 1)
 title = "SYS.CONSOLE"
+draw_fill = false
 
 [node name="Label_MachineID2" type="Label" parent="CanvasLayer/Cockpit HUD/MarginContainer/BottomLeftConsole" unique_id=1157561283]
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 0
 text = "> Scanning..."
+
+[node name="TerminalPanel" type="PanelContainer" parent="CanvasLayer/Cockpit HUD" unique_id=2142764059]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = 265.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("13_5lmna")
+title = "SYS.SCAN"
+metadata/_custom_type_script = "uid://dvfwaik57f2t8"
+
+[node name="Label" type="Label" parent="CanvasLayer/Cockpit HUD/TerminalPanel" unique_id=1979505556]
+layout_mode = 2
+text = "> UNSCANNED TArget"
 
 [node name="Water Test" type="MeshInstance3D" parent="." unique_id=480692667]
 transform = Transform3D(14.71, 0, 0, 0, -6.429945e-07, 14.71, 0, -14.71, -6.429945e-07, -18.155548, 0.120034456, -14.99268)
